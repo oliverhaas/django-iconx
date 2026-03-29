@@ -1,0 +1,47 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any
+
+from django.conf import settings
+
+VALID_MODES = ("data_uri", "url")
+VALID_COLORS = ("mono", "original")
+
+
+@dataclass(frozen=True)
+class IconSet:
+    path: str
+    prefix: str = ""
+    color: str = "mono"
+
+    def __post_init__(self) -> None:
+        if self.color not in VALID_COLORS:
+            msg = f"Invalid color {self.color!r}, must be one of {VALID_COLORS}"
+            raise ValueError(msg)
+
+
+@dataclass(frozen=True)
+class IconxSettings:
+    sets: list[IconSet] = field(default_factory=lambda: [IconSet("icons/")])
+    output: str = "static/iconx/icons.css"
+    mode: str = "url"
+    prefix: str = "icon"
+    size: str = "1em"
+
+    def __post_init__(self) -> None:
+        if self.mode not in VALID_MODES:
+            msg = f"Invalid mode {self.mode!r}, must be one of {VALID_MODES}"
+            raise ValueError(msg)
+
+
+def _normalize_sets(raw_sets: list[str | dict[str, str]]) -> list[IconSet]:
+    """Normalize set config: strings become IconSet(path=...), dicts become IconSet(**...)."""
+    return [IconSet(path=s) if isinstance(s, str) else IconSet(**s) for s in raw_sets]
+
+
+def get_settings() -> IconxSettings:
+    raw: dict[str, Any] = getattr(settings, "ICONX", {})
+    if "sets" in raw:
+        raw = {**raw, "sets": _normalize_sets(raw["sets"])}
+    return IconxSettings(**raw)

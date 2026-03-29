@@ -49,6 +49,19 @@ Key design choices:
 - **Data URIs** — no external requests, everything in one CSS file
 - **Tree-shakeable** — only the icons you use end up in the output (via Tailwind/PurgeCSS scanning)
 
+## Browser support
+
+django-iconx uses CSS `mask-image`, which is supported unprefixed in all modern browsers since December 2023 (~97% global coverage). Older browsers (Chrome < 120, Safari < 15.4) need the `-webkit-mask-image` prefix.
+
+Tailwind v4 handles vendor prefixing automatically — just `@import` the generated CSS file in your Tailwind entry point:
+
+```css
+@import "tailwindcss";
+@import "./static/iconx/icons.css";
+```
+
+With vendor prefixes applied, the only unsupported browsers are pre-Chromium Edge (≤ 18) and Internet Explorer.
+
 ## Installation
 
 ```console
