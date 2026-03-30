@@ -29,7 +29,7 @@ ICONX = {
         {"path": "icons/lucide/"},
     ],
     "output": str(BASE_DIR / "static" / "iconx" / "icons.css"),
-    "mode": "data_uri",
+    "mode": "url",
     "prefix": "icon",
     "size": "1em",
 }

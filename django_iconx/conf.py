@@ -25,7 +25,7 @@ class IconSet:
 class IconxSettings:
     sets: list[IconSet] = field(default_factory=lambda: [IconSet("icons/")])
     output: str = "static/iconx/icons.css"
-    mode: str = "data_uri"
+    mode: str = "url"
     prefix: str = "icon"
     size: str = "1em"
 

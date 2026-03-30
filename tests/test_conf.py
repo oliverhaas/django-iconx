@@ -30,7 +30,7 @@ class TestIconxSettings:
         s = IconxSettings()
         assert s.sets == [IconSet("icons/")]
         assert s.output == "static/iconx/icons.css"
-        assert s.mode == "data_uri"
+        assert s.mode == "url"
         assert s.prefix == "icon"
         assert s.size == "1em"
 

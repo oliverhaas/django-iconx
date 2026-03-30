@@ -62,7 +62,7 @@ class TestSizeVariantCss:
         return IconxSettings(**defaults)
 
     def test_default_rule_uses_largest_variant(self):
-        css = generate_css(self._settings())
+        css = generate_css(self._settings(mode="data_uri"))
         assert ".icon-search::before {" in css
         # The default rule should use 24px SVG (viewBox 0 0 24 24)
         assert "0%200%2024%2024" in css.split(".text-")[0]
