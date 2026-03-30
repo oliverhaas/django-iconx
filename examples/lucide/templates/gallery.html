@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>django-iconx — Lucide Gallery</title>
+  <link rel="stylesheet" href="{% static 'iconx/icons.css' %}">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 2rem; background: #f8f9fa; color: #1a1a2e; }
+    h1 { margin-bottom: 0.5rem; font-size: 1.5rem; }
+    .meta { color: #666; margin-bottom: 2rem; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+    .card {
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e0e0e0;
+      transition: border-color 0.15s;
+    }
+    .card:hover { border-color: #4361ee; color: #4361ee; }
+    .card .icon { font-size: var(--icon-size, 1.5rem); transition: color 0.15s; }
+    .card .name { font-size: 0.7rem; color: #666; text-align: center; word-break: break-all; }
+    .controls { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .controls label { font-size: 0.875rem; font-weight: 500; }
+    .controls select { padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #ccc; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <h1>django-iconx — Lucide Icon Gallery</h1>
+  <p class="meta">{{ icons|length }} icons loaded via CSS mask-image — hover a card to see currentColor in action</p>
+  <div class="controls">
+    <label for="size-select">Icon size:</label>
+    <select id="size-select" onchange="document.documentElement.style.setProperty('--icon-size', this.value)">
+      <option value="1rem">1rem</option>
+      <option value="1.5rem" selected>1.5rem</option>
+      <option value="2rem">2rem</option>
+      <option value="3rem">3rem</option>
+      <option value="4rem">4rem</option>
+    </select>
+  </div>
+  <div class="gallery">
+    {% for name in icons %}
+    <div class="card">
+      <i class="{{ prefix }} {{ prefix }}-{{ name }}"></i>
+      <span class="name">{{ name }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
