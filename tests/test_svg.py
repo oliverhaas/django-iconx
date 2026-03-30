@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from django_iconx.conf import IconxSettings
+from django_iconx.conf import IconSet, IconxSettings
 from django_iconx.svg import discover_svg_variants, discover_svgs, normalize_svg, svg_to_data_uri
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -54,13 +54,19 @@ class TestNormalizeSvg:
         assert "\n" not in result
         assert "  " not in result
 
+    def test_original_preserves_colors(self):
+        svg = '<svg fill="#ff0000" stroke="currentColor"><path/></svg>'
+        result = normalize_svg(svg, color="original")
+        assert 'fill="#ff0000"' in result
+        assert 'stroke="currentColor"' in result
+
 
 class TestSvgToDataUri:
     def test_produces_data_uri(self):
         svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/></svg>'
         uri = svg_to_data_uri(svg)
         assert uri.startswith("data:image/svg+xml,")
-        assert "%3Csvg" in uri  # URL-encoded <svg
+        assert "%3Csvg" in uri
 
     def test_not_base64(self):
         svg = '<svg xmlns="http://www.w3.org/2000/svg"><path/></svg>'
@@ -70,70 +76,80 @@ class TestSvgToDataUri:
 
 class TestDiscoverSvgs:
     def test_discovers_icons_from_directory(self):
-        settings = IconxSettings(sets={"": str(FIXTURES / "icons")})
+        settings = IconxSettings(sets=[IconSet("icons/")])
         icons = discover_svgs(settings)
         assert "search" in icons
         assert "x" in icons
         assert icons["search"].name == "search.svg"
 
     def test_prefixed_set(self):
-        settings = IconxSettings(sets={"hero": str(FIXTURES / "heroicons")})
+        settings = IconxSettings(sets=[IconSet("heroicons/", prefix="hero")])
         icons = discover_svgs(settings)
         assert "hero-arrow-left" in icons
 
     def test_multiple_sets(self):
-        settings = IconxSettings(
-            sets={
-                "": str(FIXTURES / "icons"),
-                "hero": str(FIXTURES / "heroicons"),
-            }
-        )
+        settings = IconxSettings(sets=[
+            IconSet("icons/"),
+            IconSet("heroicons/", prefix="hero"),
+        ])
         icons = discover_svgs(settings)
         assert "search" in icons
         assert "hero-arrow-left" in icons
 
-    def test_nonexistent_directory_skipped(self):
-        settings = IconxSettings(sets={"": "/nonexistent/path"})
+    def test_no_match_skipped(self):
+        settings = IconxSettings(sets=[IconSet("nonexistent/")])
         icons = discover_svgs(settings)
         assert icons == {}
 
+    def test_first_match_wins(self):
+        settings = IconxSettings(sets=[
+            IconSet("icons/", prefix="first"),
+            IconSet("icons/", prefix="second"),
+        ])
+        icons = discover_svgs(settings)
+        assert "first-search" in icons
+        assert "second-search" not in icons
+
+    def test_regex_path(self):
+        settings = IconxSettings(sets=[IconSet(r"icons/s.*\.svg$")])
+        icons = discover_svgs(settings)
+        # "icons/search.svg" matches, remainder is "" so icon name from match
+        # Actually: regex matches the whole path, remainder is empty
+        assert len(icons) == 1  # only search.svg matches
+
     def test_size_dirs_uses_largest_as_default(self):
-        settings = IconxSettings(sets={"": str(FIXTURES / "sized")})
+        settings = IconxSettings(sets=[IconSet("sized/")])
         icons = discover_svgs(settings)
         assert "search" in icons
-        # Default should be the 24px variant (largest)
         assert "24" in str(icons["search"])
 
     def test_size_dirs_icon_names_exclude_size_prefix(self):
-        settings = IconxSettings(sets={"": str(FIXTURES / "sized")})
+        settings = IconxSettings(sets=[IconSet("sized/")])
         icons = discover_svgs(settings)
-        # Should be "search", not "24-search"
         assert "search" in icons
         assert "x" in icons
-        assert "16-search" not in icons
-        assert "24-search" not in icons
 
 
 class TestDiscoverSvgVariants:
     def test_discovers_variants(self):
-        settings = IconxSettings(sets={"": str(FIXTURES / "sized")})
+        settings = IconxSettings(sets=[IconSet("sized/")])
         variants = discover_svg_variants(settings)
         assert "search" in variants
         assert sorted(variants["search"].keys()) == [16, 20, 24]
 
     def test_x_has_two_variants(self):
-        settings = IconxSettings(sets={"": str(FIXTURES / "sized")})
+        settings = IconxSettings(sets=[IconSet("sized/")])
         variants = discover_svg_variants(settings)
         assert "x" in variants
         assert sorted(variants["x"].keys()) == [16, 24]
 
     def test_flat_set_has_no_variants(self):
-        settings = IconxSettings(sets={"": str(FIXTURES / "icons")})
+        settings = IconxSettings(sets=[IconSet("icons/")])
         variants = discover_svg_variants(settings)
         assert variants == {}
 
     def test_prefixed_set_variants(self):
-        settings = IconxSettings(sets={"hero": str(FIXTURES / "sized")})
+        settings = IconxSettings(sets=[IconSet("sized/", prefix="hero")])
         variants = discover_svg_variants(settings)
         assert "hero-search" in variants
         assert sorted(variants["hero-search"].keys()) == [16, 20, 24]

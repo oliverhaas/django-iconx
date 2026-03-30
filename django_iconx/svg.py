@@ -6,39 +6,42 @@ from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from django.conf import settings
-from django.contrib.staticfiles.finders import find as find_static
 
 if TYPE_CHECKING:
-    from django_iconx.conf import IconxSettings
+    from django_iconx.conf import IconSet, IconxSettings
 
 
 def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
-    """Discover SVG files from configured icon sets.
+    """Discover SVG files by scanning static dirs and matching against set regexes.
 
-    Returns a dict mapping icon class names (e.g. "search", "hero-arrow-left")
-    to their SVG file paths. When size subdirectories exist (e.g. ``16/``, ``24/``),
-    the largest variant is used as the default.
+    Returns a dict mapping icon class names to their SVG file paths.
+    The largest size variant is used as default when size subdirectories exist.
     """
-    icons: dict[str, Path] = {}
+    # Collect all icons, grouping size variants
+    plain: dict[str, Path] = {}
+    sized: dict[str, dict[int, Path]] = {}
 
-    for set_prefix, directory in icon_settings.sets.items():
-        resolved = _resolve_directory(directory)
-        if resolved is None:
+    for svg_path, relative in _scan_all_svgs():
+        match = _match_set(relative, icon_settings.sets)
+        if match is None:
             continue
+        icon_set, remainder = match
 
-        size_dirs = _detect_size_dirs(resolved)
-
-        if size_dirs:
-            # Size-variant mode: numeric subdirectories contain size-specific SVGs
-            for icon_name, variants in _collect_size_variants(size_dirs, set_prefix).items():
-                # Use the largest variant as default
-                largest_size = max(variants)
-                icons[icon_name] = variants[largest_size]
+        size, rest = _extract_size_prefix(remainder)
+        if size is not None:
+            icon_name = _remainder_to_icon_name(rest, icon_set.prefix)
+            if icon_name not in sized:
+                sized[icon_name] = {}
+            sized[icon_name][size] = svg_path
         else:
-            # Flat mode: all SVGs in one directory
-            for svg_path in sorted(resolved.glob("**/*.svg")):
-                icon_name = _path_to_icon_name(svg_path, resolved, set_prefix)
-                icons[icon_name] = svg_path
+            icon_name = _remainder_to_icon_name(remainder, icon_set.prefix)
+            plain[icon_name] = svg_path
+
+    # Merge: sized icons use the largest variant as default
+    icons = dict(plain)
+    for icon_name, size_map in sized.items():
+        largest = max(size_map)
+        icons[icon_name] = size_map[largest]
 
     return icons
 
@@ -49,113 +52,122 @@ def discover_svg_variants(icon_settings: IconxSettings) -> dict[str, dict[int, P
     Returns a dict mapping icon names to their size variants (px -> path).
     Only includes icons with 2+ size variants.
     """
-    variants: dict[str, dict[int, Path]] = {}
+    # First collect all SVGs with their size info
+    raw: dict[str, dict[int, Path]] = {}
 
-    for set_prefix, directory in icon_settings.sets.items():
-        resolved = _resolve_directory(directory)
-        if resolved is None:
+    for svg_path, relative in _scan_all_svgs():
+        match = _match_set(relative, icon_settings.sets)
+        if match is None:
+            continue
+        icon_set, remainder = match
+
+        # Check if remainder starts with a size directory
+        size, rest = _extract_size_prefix(remainder)
+        if size is None:
             continue
 
-        size_dirs = _detect_size_dirs(resolved)
-        if not size_dirs:
+        icon_name = _remainder_to_icon_name(rest, icon_set.prefix)
+        if icon_name not in raw:
+            raw[icon_name] = {}
+        raw[icon_name][size] = svg_path
+
+    return {name: sizes for name, sizes in raw.items() if len(sizes) >= 2}  # noqa: PLR2004
+
+
+def discover_icon_sets(icon_settings: IconxSettings) -> dict[str, IconSet]:
+    """Map each icon name to its IconSet config (for color mode lookup)."""
+    result: dict[str, IconSet] = {}
+
+    for _svg_path, relative in _scan_all_svgs():
+        match = _match_set(relative, icon_settings.sets)
+        if match is None:
             continue
+        icon_set, remainder = match
 
-        variants.update({
-            icon_name: size_map
-            for icon_name, size_map in _collect_size_variants(size_dirs, set_prefix).items()
-            if len(size_map) >= 2  # noqa: PLR2004
-        })
-
-    return variants
-
-
-def _detect_size_dirs(root: Path) -> dict[int, Path]:
-    """Detect numeric subdirectories (e.g. 16/, 20/, 24/) as size directories."""
-    size_dirs: dict[int, Path] = {}
-    for child in root.iterdir():
-        if child.is_dir():
-            try:
-                size = int(child.name)
-            except ValueError:
-                continue
-            # Only treat as size dir if it contains SVGs
-            if any(child.glob("*.svg")):
-                size_dirs[size] = child
-    return size_dirs
-
-
-def _collect_size_variants(
-    size_dirs: dict[int, Path],
-    set_prefix: str,
-) -> dict[str, dict[int, Path]]:
-    """Collect all size variants for each icon across size directories."""
-    result: dict[str, dict[int, Path]] = {}
-
-    for size_px, size_dir in sorted(size_dirs.items()):
-        for svg_path in sorted(size_dir.glob("**/*.svg")):
-            # Icon name from path relative to the size dir (not root)
-            icon_name = _path_to_icon_name(svg_path, size_dir, set_prefix)
-            if icon_name not in result:
-                result[icon_name] = {}
-            result[icon_name][size_px] = svg_path
+        # Strip size prefix if present
+        size, rest = _extract_size_prefix(remainder)
+        name_remainder = rest if size is not None else remainder
+        icon_name = _remainder_to_icon_name(name_remainder, icon_set.prefix)
+        result[icon_name] = icon_set
 
     return result
 
 
-def _path_to_icon_name(svg_path: Path, base_dir: Path, set_prefix: str) -> str:
-    """Convert a SVG file path to an icon class name."""
-    relative = svg_path.relative_to(base_dir)
-    parts = list(relative.parts)
-    parts[-1] = relative.stem  # strip .svg
-    icon_name = "-".join(parts)
+def _scan_all_svgs() -> list[tuple[Path, str]]:
+    """Scan all STATICFILES_DIRS for SVG files.
 
-    if set_prefix:
-        icon_name = f"{set_prefix}-{icon_name}"
+    Returns list of (absolute_path, relative_path_from_static_root) tuples.
+    """
+    results: list[tuple[Path, str]] = []
+    seen: set[Path] = set()
 
-    return icon_name
-
-
-def _resolve_directory(directory: str) -> Path | None:
-    """Resolve an icon directory, checking staticfiles finders and STATICFILES_DIRS."""
-    # Try as a staticfiles path first
-    result = find_static(directory)
-    if result:
-        p = Path(result) if isinstance(result, str) else Path(result[0])
-        if p.is_dir():
-            return p
-
-    # Try relative to STATICFILES_DIRS
     for static_dir in getattr(settings, "STATICFILES_DIRS", []):
-        candidate = Path(static_dir) / directory
-        if candidate.is_dir():
-            return candidate
+        static_path = Path(static_dir)
+        if not static_path.is_dir():
+            continue
+        for svg_path in sorted(static_path.glob("**/*.svg")):
+            resolved = svg_path.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
+            relative = str(svg_path.relative_to(static_path))
+            results.append((svg_path, relative))
 
-    # Try relative to BASE_DIR
-    base_dir = getattr(settings, "BASE_DIR", None)
-    if base_dir:
-        candidate = Path(base_dir) / directory
-        if candidate.is_dir():
-            return candidate
+    return results
 
-    # Try as absolute path
-    candidate = Path(directory)
-    if candidate.is_dir():
-        return candidate
 
+def _match_set(relative_path: str, sets: list[IconSet]) -> tuple[IconSet, str] | None:
+    """Match a relative SVG path against the ordered set regexes.
+
+    Returns (matched_set, remainder_after_match) or None.
+    """
+    for icon_set in sets:
+        m = re.match(icon_set.path, relative_path)
+        if m:
+            remainder = relative_path[m.end() :]
+            return icon_set, remainder
     return None
 
 
-def normalize_svg(svg_content: str) -> str:
-    """Normalize SVG for use with CSS mask-image.
+def _extract_size_prefix(remainder: str) -> tuple[int | None, str]:
+    """Check if remainder starts with a numeric size directory (e.g. '24/search.svg').
 
-    For mask-image, the SVG is rendered as a bitmap where black = visible and
-    transparent = hidden. ``currentColor`` won't resolve inside a data-URI,
-    so we replace color attributes with ``black`` to ensure visibility.
+    Returns (size_px, rest) or (None, remainder).
+    """
+    m = re.match(r"(\d+)/(.+)", remainder)
+    if m:
+        return int(m.group(1)), m.group(2)
+    return None, remainder
 
-    - Strips XML declarations and comments
-    - Removes metadata elements
-    - Replaces ``currentColor`` in fill/stroke with ``black``
-    - Removes non-``none``, non-``currentColor`` fills (decorative colors)
+
+def _remainder_to_icon_name(remainder: str, prefix: str) -> str:
+    """Convert the remainder of a matched path to an icon class name.
+
+    'search.svg' -> 'search'
+    'sub/arrow-left.svg' -> 'sub-arrow-left'
+    """
+    # Strip .svg extension
+    name = re.sub(r"\.svg$", "", remainder)
+    # Replace path separators with dashes
+    name = name.replace("/", "-").replace("\\", "-")
+
+    if prefix:
+        name = f"{prefix}-{name}"
+
+    return name
+
+
+
+def normalize_svg(svg_content: str, *, color: str = "mono") -> str:
+    """Normalize SVG for CSS embedding.
+
+    In ``mono`` mode (mask-image), colors are replaced with ``black`` so the
+    SVG works as a luminance mask driven by ``currentColor``.
+
+    In ``original`` mode (background-image), colors are preserved so the SVG
+    renders with its own fills and strokes.
+
+    Both modes strip XML declarations, comments, and metadata.
     """
     # Strip XML declaration
     svg_content = re.sub(r"<\?xml[^?]*\?>", "", svg_content)
@@ -163,16 +175,19 @@ def normalize_svg(svg_content: str) -> str:
     svg_content = re.sub(r"<!--[\s\S]*?-->", "", svg_content)
     # Strip metadata, title, desc elements
     svg_content = re.sub(r"<(metadata|title|desc)[^>]*>[\s\S]*?</\1>", "", svg_content)
-    # Replace currentColor with black (currentColor won't resolve in data-URIs)
-    svg_content = re.sub(r'(fill|stroke)="currentColor"', r'\1="black"', svg_content)
-    # Remove decorative fills (not none, not black — those are structural/needed)
-    svg_content = re.sub(r'\s+fill="(?!none|black)[^"]*"', "", svg_content)
+
+    if color == "mono":
+        # Replace currentColor with black (currentColor won't resolve in data-URIs)
+        svg_content = re.sub(r'(fill|stroke)="currentColor"', r'\1="black"', svg_content)
+        # Remove decorative fills (not none, not black — those are structural/needed)
+        svg_content = re.sub(r'\s+fill="(?!none|black)[^"]*"', "", svg_content)
+
     # Collapse whitespace
     return re.sub(r"\s+", " ", svg_content).strip()
 
 
-def svg_to_data_uri(svg_content: str) -> str:
+def svg_to_data_uri(svg_content: str, *, color: str = "mono") -> str:
     """Convert SVG content to a URL-encoded data URI (not base64)."""
-    normalized = normalize_svg(svg_content)
+    normalized = normalize_svg(svg_content, color=color)
     encoded = quote(normalized, safe="")
     return f"data:image/svg+xml,{encoded}"

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from django_iconx.conf import IconxSettings
+from django_iconx.conf import IconSet, IconxSettings
 from django_iconx.css import generate_css
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -10,7 +10,7 @@ FIXTURES = Path(__file__).parent / "fixtures"
 
 class TestGenerateCss:
     def _settings(self, **kwargs):
-        defaults = {"sets": {"": str(FIXTURES / "icons")}}
+        defaults = {"sets": [IconSet("icons/")]}
         defaults.update(kwargs)
         return IconxSettings(**defaults)
 
@@ -57,7 +57,7 @@ class TestGenerateCss:
 
 class TestSizeVariantCss:
     def _settings(self, **kwargs):
-        defaults = {"sets": {"": str(FIXTURES / "sized")}}
+        defaults = {"sets": [IconSet("sized/")]}
         defaults.update(kwargs)
         return IconxSettings(**defaults)
 
@@ -69,31 +69,60 @@ class TestSizeVariantCss:
 
     def test_text_xs_maps_to_smallest(self):
         css = generate_css(self._settings())
-        # text-xs (12px) should map to 16px variant (nearest)
         assert ".text-xs.icon-search::before" in css
 
     def test_text_xl_maps_to_20(self):
         css = generate_css(self._settings())
-        # text-xl (20px) should map to 20px variant
         assert ".text-xl.icon-search::before" in css
 
     def test_text_2xl_not_overridden(self):
         css = generate_css(self._settings())
-        # text-2xl (24px) maps to 24px variant which is the default — no override needed
         assert ".text-2xl.icon-search::before" not in css
 
     def test_text_classes_grouped(self):
         css = generate_css(self._settings())
-        # text-sm (14px) and text-base (16px) both map to 16px variant
-        # They should share a rule
         assert ".text-sm.icon-search::before,\n.text-base.icon-search::before" in css
 
     def test_flat_set_no_variant_rules(self):
-        flat_settings = IconxSettings(sets={"": str(FIXTURES / "icons")})
-        css = generate_css(flat_settings)
+        settings = IconxSettings(sets=[IconSet("icons/")])
+        css = generate_css(settings)
         assert ".text-" not in css
 
     def test_subset_filters_variants(self):
         css = generate_css(self._settings(), subset={"search"})
         assert ".text-xs.icon-search::before" in css
         assert ".text-xs.icon-x::before" not in css
+
+
+class TestOriginalColorCss:
+    def _settings(self, **kwargs):
+        defaults = {"sets": [IconSet("icons/", color="original")]}
+        defaults.update(kwargs)
+        return IconxSettings(**defaults)
+
+    def test_uses_background_image(self):
+        css = generate_css(self._settings())
+        assert "background: url(" in css
+        assert "mask-image: none;" in css
+
+    def test_no_mask_image_for_original(self):
+        css = generate_css(self._settings())
+        for line in css.split("\n"):
+            if "mask-image:" in line:
+                assert "none" in line
+
+    def test_mixed_sets(self):
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/", color="mono"),
+                IconSet("heroicons/", prefix="logo", color="original"),
+            ]
+        )
+        css = generate_css(settings)
+        assert ".icon-search::before {\n  mask-image: url(" in css
+        assert ".icon-logo-arrow-left::before {\n  background: url(" in css
+
+    def test_url_mode_original(self):
+        css = generate_css(self._settings(mode="url"))
+        assert 'background: url("search.svg") no-repeat center / contain;' in css
+        assert "mask-image: none;" in css

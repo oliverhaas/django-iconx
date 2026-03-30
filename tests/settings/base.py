@@ -3,6 +3,7 @@ SECRET_KEY = "test-secret-key"
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.staticfiles",
     "django_iconx",
 ]
 

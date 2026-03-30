@@ -25,9 +25,9 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 ICONX = {
-    "sets": {
-        "": "icons/lucide/",
-    },
+    "sets": [
+        {"path": "icons/lucide/"},
+    ],
     "output": str(BASE_DIR / "static" / "iconx" / "icons.css"),
     "mode": "data_uri",
     "prefix": "icon",

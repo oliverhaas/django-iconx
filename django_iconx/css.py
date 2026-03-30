@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django_iconx.svg import discover_svg_variants, discover_svgs, svg_to_data_uri
+from django_iconx.svg import discover_icon_sets, discover_svg_variants, discover_svgs, svg_to_data_uri
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -32,6 +32,7 @@ def generate_css(
     """Generate the complete CSS file content for all configured icons."""
     icons = discover_svgs(icon_settings)
     variants = discover_svg_variants(icon_settings)
+    icon_set_map = discover_icon_sets(icon_settings)
 
     if subset:
         icons = {name: path for name, path in icons.items() if name in subset}
@@ -41,13 +42,15 @@ def generate_css(
     lines = [_base_rule(prefix, icon_settings.size)]
 
     for icon_name, svg_path in sorted(icons.items()):
-        rule = _icon_rule(prefix, icon_name, svg_path, icon_settings.mode)
+        color = icon_set_map[icon_name].color
+        rule = _icon_rule(prefix, icon_name, svg_path, icon_settings.mode, color)
         if rule:
             lines.append(rule)
 
     # Generate size-variant overrides
     for icon_name, size_map in sorted(variants.items()):
-        variant_rules = _size_variant_rules(prefix, icon_name, size_map, icon_settings.mode)
+        color = icon_set_map[icon_name].color
+        variant_rules = _size_variant_rules(prefix, icon_name, size_map, icon_settings.mode, color)
         if variant_rules:
             lines.append(variant_rules)
 
@@ -68,14 +71,24 @@ def _base_rule(prefix: str, size: str) -> str:
 }}"""
 
 
-def _icon_rule(prefix: str, icon_name: str, svg_path: Path, mode: str) -> str | None:
+def _icon_rule(prefix: str, icon_name: str, svg_path: Path, mode: str, color: str) -> str | None:
     if mode == "data_uri":
         svg_content = svg_path.read_text(encoding="utf-8")
-        data_uri = svg_to_data_uri(svg_content)
+        data_uri = svg_to_data_uri(svg_content, color=color)
+        if color == "original":
+            return f"""\n.{prefix}-{icon_name}::before {{
+  background: url("{data_uri}") no-repeat center / contain;
+  mask-image: none;
+}}"""
         return f"""\n.{prefix}-{icon_name}::before {{
   mask-image: url("{data_uri}");
 }}"""
     if mode == "url":
+        if color == "original":
+            return f"""\n.{prefix}-{icon_name}::before {{
+  background: url("{svg_path.name}") no-repeat center / contain;
+  mask-image: none;
+}}"""
         return f"""\n.{prefix}-{icon_name}::before {{
   mask-image: url("{svg_path.name}");
 }}"""
@@ -87,7 +100,9 @@ def _nearest_variant(available_sizes: list[int], target_px: int) -> int:
     return min(available_sizes, key=lambda s: abs(s - target_px))
 
 
-def _size_variant_rules(prefix: str, icon_name: str, size_map: dict[int, Path], mode: str) -> str:
+def _size_variant_rules(
+    prefix: str, icon_name: str, size_map: dict[int, Path], mode: str, color: str
+) -> str:
     """Generate text-* override rules that swap to the optimal SVG variant."""
     available = sorted(size_map)
     largest = max(available)
@@ -106,21 +121,24 @@ def _size_variant_rules(prefix: str, icon_name: str, size_map: dict[int, Path], 
     if not variant_to_classes:
         return ""
 
+    prop = "background" if color == "original" else "mask-image"
     rules: list[str] = []
     for size_px, text_classes in sorted(variant_to_classes.items()):
         svg_path = size_map[size_px]
         if mode == "data_uri":
             svg_content = svg_path.read_text(encoding="utf-8")
-            data_uri = svg_to_data_uri(svg_content)
-            mask_value = f'url("{data_uri}")'
+            data_uri = svg_to_data_uri(svg_content, color=color)
+            url_value = f'url("{data_uri}")'
         elif mode == "url":
-            mask_value = f'url("{svg_path.name}")'
+            url_value = f'url("{svg_path.name}")'
         else:
             continue
 
+        css_value = f"{url_value} no-repeat center / contain" if color == "original" else url_value
+
         selectors = ",\n".join(f".{tc}.{prefix}-{icon_name}::before" for tc in text_classes)
         rules.append(f"""\n{selectors} {{
-  mask-image: {mask_value};
+  {prop}: {css_value};
 }}""")
 
     return "\n".join(rules)
