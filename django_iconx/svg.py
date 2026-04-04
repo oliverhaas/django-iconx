@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import re
 from dataclasses import dataclass, field
@@ -8,6 +9,8 @@ from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from django.conf import settings
+
+logger = logging.getLogger("django_iconx")
 
 if TYPE_CHECKING:
     from django_iconx.conf import IconSet, IconxSettings
@@ -24,11 +27,14 @@ class DiscoveredIcons:
     icon_sets: dict[str, IconSet] = field(default_factory=dict)
 
 
-def discover(icon_settings: IconxSettings) -> DiscoveredIcons:
+def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> DiscoveredIcons:  # noqa: C901
     """Discover all SVG icons in a single filesystem scan.
 
     Returns a DiscoveredIcons with icons, their relative paths, size variants,
     and the IconSet each icon belongs to.
+
+    If skip_collisions is True, name collisions log a warning and keep the first
+    match. Otherwise, collisions raise ValueError.
     """
     plain: dict[str, Path] = {}
     plain_rel: dict[str, str] = {}
@@ -54,7 +60,10 @@ def discover(icon_settings: IconxSettings) -> DiscoveredIcons:
             icon_name = _remainder_to_icon_name(remainder, icon_set.prefix)
             if icon_name in plain:
                 msg = f"Icon name collision: '{icon_name}' produced by both '{plain[icon_name]}' and '{svg_path}'"
-                raise ValueError(msg)
+                if not skip_collisions:
+                    raise ValueError(msg)
+                logger.warning(msg)
+                continue
             plain[icon_name] = svg_path
             plain_rel[icon_name] = relative
 
@@ -64,18 +73,22 @@ def discover(icon_settings: IconxSettings) -> DiscoveredIcons:
     for icon_name in sized:
         if icon_name in plain:
             msg = f"Icon name collision: '{icon_name}' exists as both a plain icon and a sized variant"
-            raise ValueError(msg)
+            if not skip_collisions:
+                raise ValueError(msg)
+            logger.warning(msg)
 
-    # Merge: sized icons use the largest variant as default
+    # Merge: sized icons use the largest variant as default (skip collisions with plain)
     icons = dict(plain)
     relatives = dict(plain_rel)
     for icon_name, size_map in sized.items():
+        if icon_name in plain:
+            continue
         largest = max(size_map)
         icons[icon_name] = size_map[largest]
         relatives[icon_name] = sized_rel[icon_name][largest]
 
-    # Filter variants to 2+ sizes only
-    variants = {name: sizes for name, sizes in sized.items() if len(sizes) >= 2}  # noqa: PLR2004
+    # Filter variants to 2+ sizes only (skip collisions with plain)
+    variants = {name: sizes for name, sizes in sized.items() if len(sizes) >= 2 and name not in plain}  # noqa: PLR2004
     variant_rels = {name: sized_rel[name] for name in variants}
 
     return DiscoveredIcons(

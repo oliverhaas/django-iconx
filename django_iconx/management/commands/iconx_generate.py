@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand, CommandParser
 
 from django_iconx.conf import get_settings
 from django_iconx.css import generate_css
-from django_iconx.svg import discover_svgs
+from django_iconx.svg import discover
 
 
 class Command(BaseCommand):
@@ -35,6 +35,11 @@ class Command(BaseCommand):
             action="store_true",
             help="Print CSS to stdout instead of writing to file",
         )
+        parser.add_argument(
+            "--skip-name-collisions",
+            action="store_true",
+            help="Warn on icon name collisions instead of aborting",
+        )
 
     def handle(self, **options: Any) -> None:  # noqa: ANN401
         icon_settings = get_settings()
@@ -53,18 +58,18 @@ class Command(BaseCommand):
         if options["subset"]:
             subset = {s.strip() for s in options["subset"].split(",")}
 
-        # Discover icons
+        # Discover icons (single scan, shared with generate_css)
         try:
-            icons = discover_svgs(icon_settings)
+            discovered = discover(icon_settings, skip_collisions=options["skip_name_collisions"])
         except ValueError as e:
             self.stderr.write(self.style.ERROR(str(e)))
             return
-        if not icons:
+        if not discovered.icons:
             self.stderr.write(self.style.WARNING("No SVG icons found in configured sets."))
             return
 
         # Generate CSS
-        css = generate_css(icon_settings, subset=subset)
+        css = generate_css(icon_settings, subset=subset, discovered=discovered)
 
         if options["dry_run"]:
             self.stdout.write(css)
@@ -75,7 +80,7 @@ class Command(BaseCommand):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(css, encoding="utf-8")
 
-        icon_count = len(icons) if subset is None else len(subset & set(icons.keys()))
+        icon_count = len(discovered.icons) if subset is None else len(subset & discovered.icons.keys())
         self.stdout.write(
             self.style.SUCCESS(f"Generated {output_path} with {icon_count} icons ({icon_settings.mode} mode)"),
         )

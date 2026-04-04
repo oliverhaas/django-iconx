@@ -43,7 +43,7 @@ class TestGenerateCss:
     def test_url_mode(self):
         css = generate_css(self._settings(mode="url"))
         assert "data:image/svg+xml," not in css
-        assert 'mask-image: url("search.svg")' in css
+        assert 'mask-image: url("/static/icons/search.svg")' in css
 
     def test_custom_prefix(self):
         css = generate_css(self._settings(prefix="i"))
@@ -141,4 +141,4 @@ class TestOriginalColorCss:
 
     def test_url_mode_original(self):
         css = generate_css(self._settings(mode="url"))
-        assert 'background-image: url("search.svg")' in css
+        assert 'background-image: url("/static/icons/search.svg")' in css

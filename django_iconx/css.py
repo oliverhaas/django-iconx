@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django_iconx.svg import discover_icon_sets, discover_svg_variants, discover_svgs, svg_to_data_uri
+from django.conf import settings
+
+from django_iconx.svg import DiscoveredIcons, discover, svg_to_data_uri
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -28,17 +30,22 @@ def generate_css(
     icon_settings: IconxSettings,
     *,
     subset: set[str] | None = None,
+    discovered: DiscoveredIcons | None = None,
 ) -> str:
     """Generate the complete CSS file content for all configured icons."""
-    icons = discover_svgs(icon_settings)
-    variants = discover_svg_variants(icon_settings)
-    icon_set_map = discover_icon_sets(icon_settings)
+    if discovered is None:
+        discovered = discover(icon_settings)
+
+    icons = discovered.icons
+    variants = discovered.variants
+    icon_set_map = discovered.icon_sets
 
     if subset:
         icons = {name: path for name, path in icons.items() if name in subset}
         variants = {name: v for name, v in variants.items() if name in subset}
 
     prefix = icon_settings.prefix
+    mode = icon_settings.mode
 
     # Partition icons by color mode
     mono_names = sorted(n for n in icons if icon_set_map[n].color == "mono")
@@ -55,16 +62,23 @@ def generate_css(
         lines.append(_multi_base_rule(prefix, multi_names))
 
     # Individual icon rules
-    for icon_name, svg_path in sorted(icons.items()):
+    for icon_name in sorted(icons):
         color = icon_set_map[icon_name].color
-        rule = _icon_rule(prefix, icon_name, svg_path, icon_settings.mode, color)
+        rule = _icon_rule(prefix, icon_name, icons[icon_name], discovered.relatives[icon_name], mode, color)
         if rule:
             lines.append(rule)
 
     # Size-variant overrides
-    for icon_name, size_map in sorted(variants.items()):
+    for icon_name in sorted(variants):
         color = icon_set_map[icon_name].color
-        variant_rules = _size_variant_rules(prefix, icon_name, size_map, icon_settings.mode, color)
+        variant_rules = _size_variant_rules(
+            prefix,
+            icon_name,
+            variants[icon_name],
+            discovered.variant_relatives[icon_name],
+            mode,
+            color,
+        )
         if variant_rules:
             lines.append(variant_rules)
 
@@ -103,20 +117,21 @@ def _multi_base_rule(prefix: str, icon_names: list[str]) -> str:
 }}"""
 
 
-def _icon_rule(prefix: str, icon_name: str, svg_path: Path, mode: str, color: str) -> str | None:
-    url = _svg_url(svg_path, mode)
+def _icon_rule(prefix: str, icon_name: str, svg_path: Path, relative: str, mode: str, color: str) -> str | None:  # noqa: PLR0913
+    url = _svg_url(svg_path, relative, mode)
     if url is None:
         return None
     prop = "background-image" if color == "original" else "mask-image"
     return f'\n.{prefix}-{icon_name} {{ {prop}: url("{url}"); }}'
 
 
-def _svg_url(svg_path: Path, mode: str) -> str | None:
+def _svg_url(svg_path: Path, relative: str, mode: str) -> str | None:
     if mode == "data_uri":
         svg_content = svg_path.read_text(encoding="utf-8")
         return svg_to_data_uri(svg_content)
     if mode == "url":
-        return svg_path.name
+        static_url = getattr(settings, "STATIC_URL", None) or "/static/"
+        return f"{static_url}{relative}"
     return None
 
 
@@ -125,10 +140,11 @@ def _nearest_variant(available_sizes: list[int], target_px: int) -> int:
     return min(available_sizes, key=lambda s: abs(s - target_px))
 
 
-def _size_variant_rules(
+def _size_variant_rules(  # noqa: PLR0913
     prefix: str,
     icon_name: str,
     size_map: dict[int, Path],
+    size_relatives: dict[int, str],
     mode: str,
     color: str,
 ) -> str:
@@ -152,7 +168,7 @@ def _size_variant_rules(
     prop = "background-image" if color == "original" else "mask-image"
     rules: list[str] = []
     for size_px, text_classes in sorted(variant_to_classes.items()):
-        url = _svg_url(size_map[size_px], mode)
+        url = _svg_url(size_map[size_px], size_relatives[size_px], mode)
         if url is None:
             continue
 

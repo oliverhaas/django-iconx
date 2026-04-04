@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import pytest
 
 from django_iconx.conf import IconSet, IconxSettings
-from django_iconx.svg import discover_svg_variants, discover_svgs, normalize_svg, svg_to_data_uri
+from django_iconx.svg import discover, discover_svg_variants, discover_svgs, normalize_svg, svg_to_data_uri
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -122,6 +123,18 @@ class TestDiscoverSvgs:
         )
         with pytest.raises(ValueError, match=r"collision.*search"):
             discover_svgs(settings)
+
+    def test_name_collision_skip_warns_and_keeps_first(self, caplog):
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/"),
+                IconSet("dupes/"),
+            ],
+        )
+        with caplog.at_level(logging.WARNING, logger="django_iconx"):
+            discovered = discover(settings, skip_collisions=True)
+        assert "collision" in caplog.text.lower()
+        assert "search" in discovered.icons
 
 
 class TestDiscoverSvgVariants:
