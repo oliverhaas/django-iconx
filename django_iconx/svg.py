@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 from urllib.parse import quote
@@ -12,14 +13,28 @@ if TYPE_CHECKING:
     from django_iconx.conf import IconSet, IconxSettings
 
 
-def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
-    """Discover SVG files by scanning static dirs and matching against set regexes.
+@dataclass(frozen=True)
+class DiscoveredIcons:
+    """Result of a single discovery pass over all configured icon sets."""
 
-    Returns a dict mapping icon class names to their SVG file paths.
-    The largest size variant is used as default when size subdirectories exist.
+    icons: dict[str, Path] = field(default_factory=dict)
+    relatives: dict[str, str] = field(default_factory=dict)
+    variants: dict[str, dict[int, Path]] = field(default_factory=dict)
+    variant_relatives: dict[str, dict[int, str]] = field(default_factory=dict)
+    icon_sets: dict[str, IconSet] = field(default_factory=dict)
+
+
+def discover(icon_settings: IconxSettings) -> DiscoveredIcons:
+    """Discover all SVG icons in a single filesystem scan.
+
+    Returns a DiscoveredIcons with icons, their relative paths, size variants,
+    and the IconSet each icon belongs to.
     """
     plain: dict[str, Path] = {}
+    plain_rel: dict[str, str] = {}
     sized: dict[str, dict[int, Path]] = {}
+    sized_rel: dict[str, dict[int, str]] = {}
+    icon_set_map: dict[str, IconSet] = {}
 
     for svg_path, relative in _scan_all_svgs():
         match = _match_set(relative, icon_settings.sets)
@@ -32,13 +47,18 @@ def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
             icon_name = _remainder_to_icon_name(rest, icon_set.prefix)
             if icon_name not in sized:
                 sized[icon_name] = {}
+                sized_rel[icon_name] = {}
             sized[icon_name][size] = svg_path
+            sized_rel[icon_name][size] = relative
         else:
             icon_name = _remainder_to_icon_name(remainder, icon_set.prefix)
             if icon_name in plain:
                 msg = f"Icon name collision: '{icon_name}' produced by both '{plain[icon_name]}' and '{svg_path}'"
                 raise ValueError(msg)
             plain[icon_name] = svg_path
+            plain_rel[icon_name] = relative
+
+        icon_set_map[icon_name] = icon_set
 
     # Check for collisions between plain and sized icons
     for icon_name in sized:
@@ -48,11 +68,31 @@ def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
 
     # Merge: sized icons use the largest variant as default
     icons = dict(plain)
+    relatives = dict(plain_rel)
     for icon_name, size_map in sized.items():
         largest = max(size_map)
         icons[icon_name] = size_map[largest]
+        relatives[icon_name] = sized_rel[icon_name][largest]
 
-    return icons
+    # Filter variants to 2+ sizes only
+    variants = {name: sizes for name, sizes in sized.items() if len(sizes) >= 2}  # noqa: PLR2004
+    variant_rels = {name: sized_rel[name] for name in variants}
+
+    return DiscoveredIcons(
+        icons=icons,
+        relatives=relatives,
+        variants=variants,
+        variant_relatives=variant_rels,
+        icon_sets=icon_set_map,
+    )
+
+
+def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
+    """Discover SVG files by scanning static dirs and matching against set regexes.
+
+    Returns a dict mapping icon class names to their SVG file paths.
+    """
+    return discover(icon_settings).icons
 
 
 def discover_svg_variants(icon_settings: IconxSettings) -> dict[str, dict[int, Path]]:
@@ -61,42 +101,7 @@ def discover_svg_variants(icon_settings: IconxSettings) -> dict[str, dict[int, P
     Returns a dict mapping icon names to their size variants (px -> path).
     Only includes icons with 2+ size variants.
     """
-    raw: dict[str, dict[int, Path]] = {}
-
-    for svg_path, relative in _scan_all_svgs():
-        match = _match_set(relative, icon_settings.sets)
-        if match is None:
-            continue
-        icon_set, remainder = match
-
-        size, rest = _extract_size_prefix(remainder)
-        if size is None:
-            continue
-
-        icon_name = _remainder_to_icon_name(rest, icon_set.prefix)
-        if icon_name not in raw:
-            raw[icon_name] = {}
-        raw[icon_name][size] = svg_path
-
-    return {name: sizes for name, sizes in raw.items() if len(sizes) >= 2}  # noqa: PLR2004
-
-
-def discover_icon_sets(icon_settings: IconxSettings) -> dict[str, IconSet]:
-    """Map each icon name to its IconSet config (for color mode lookup)."""
-    result: dict[str, IconSet] = {}
-
-    for _svg_path, relative in _scan_all_svgs():
-        match = _match_set(relative, icon_settings.sets)
-        if match is None:
-            continue
-        icon_set, remainder = match
-
-        size, rest = _extract_size_prefix(remainder)
-        name_remainder = rest if size is not None else remainder
-        icon_name = _remainder_to_icon_name(name_remainder, icon_set.prefix)
-        result[icon_name] = icon_set
-
-    return result
+    return discover(icon_settings).variants
 
 
 def _scan_all_svgs() -> list[tuple[Path, str]]:
@@ -108,7 +113,9 @@ def _scan_all_svgs() -> list[tuple[Path, str]]:
     seen: set[Path] = set()
 
     for static_dir in getattr(settings, "STATICFILES_DIRS", []):
-        static_path = Path(static_dir)
+        # Django allows STATICFILES_DIRS entries to be (prefix, path) tuples
+        raw_path = static_dir[1] if isinstance(static_dir, (list, tuple)) else static_dir
+        static_path = Path(raw_path)
         if not static_path.is_dir():
             continue
         for dirpath, _dirnames, filenames in os.walk(static_path, followlinks=True):
