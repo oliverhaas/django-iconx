@@ -60,10 +60,14 @@ class TestIconxSettings:
         s = get_settings()
         assert s.prefix == "icon"
 
-    @override_settings(ICONX={"sets": [
-        "icons/",
-        {"path": "logos/", "prefix": "logo", "color": "original"},
-    ]})
+    @override_settings(
+        ICONX={
+            "sets": [
+                "icons/",
+                {"path": "logos/", "prefix": "logo", "color": "original"},
+            ],
+        },
+    )
     def test_get_settings_normalizes_sets(self):
         s = get_settings()
         assert s.sets[0] == IconSet("icons/")

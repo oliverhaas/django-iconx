@@ -2,9 +2,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-SECRET_KEY = "example-secret-key-not-for-production"
+SECRET_KEY = "example-secret-key-not-for-production"  # noqa: S105
 DEBUG = True
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*"]  # noqa: S104
 
 INSTALLED_APPS = [
     "django.contrib.staticfiles",
@@ -29,7 +29,7 @@ ICONX = {
         {"path": "icons/lucide/"},
     ],
     "output": str(BASE_DIR / "static" / "iconx" / "icons.css"),
-    "mode": "url",
+    "mode": "data_uri",
     "prefix": "icon",
     "size": "1em",
 }

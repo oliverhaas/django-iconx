@@ -13,8 +13,8 @@ class TestIconxGenerateCommand:
     def test_dry_run(self, capsys):
         call_command("iconx_generate", dry_run=True)
         output = capsys.readouterr().out
-        assert ".icon::before {" in output
-        assert ".icon-search::before {" in output
+        assert ".icon {" in output
+        assert ".icon-search {" in output
 
     @override_settings(ICONX={"sets": ["icons/"]})
     def test_writes_file(self, tmp_path):
@@ -22,14 +22,14 @@ class TestIconxGenerateCommand:
         call_command("iconx_generate", output=str(output_file))
         assert output_file.exists()
         css = output_file.read_text()
-        assert ".icon-search::before {" in css
+        assert ".icon-search {" in css
 
     @override_settings(ICONX={"sets": ["icons/"]})
     def test_subset(self, capsys):
         call_command("iconx_generate", dry_run=True, subset="search")
         output = capsys.readouterr().out
-        assert ".icon-search::before {" in output
-        assert ".icon-x::before {" not in output
+        assert ".icon-search {" in output
+        assert ".icon-x" not in output
 
     @override_settings(ICONX={"sets": ["nonexistent/"]})
     def test_no_icons_warning(self, capsys):

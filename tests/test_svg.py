@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from django_iconx.conf import IconSet, IconxSettings
 from django_iconx.svg import discover_svg_variants, discover_svgs, normalize_svg, svg_to_data_uri
 
@@ -25,40 +27,17 @@ class TestNormalizeSvg:
         result = normalize_svg(svg)
         assert "metadata" not in result
 
-    def test_replaces_currentcolor_with_black(self):
-        svg = '<svg fill="currentColor" stroke="currentColor"><path/></svg>'
+    def test_preserves_all_colors(self):
+        svg = '<svg fill="currentColor" stroke="#ff0000"><path/></svg>'
         result = normalize_svg(svg)
-        assert 'fill="black"' in result
-        assert 'stroke="black"' in result
-        assert "currentColor" not in result
-
-    def test_preserves_fill_none(self):
-        svg = '<svg fill="none"><path/></svg>'
-        result = normalize_svg(svg)
-        assert 'fill="none"' in result
-
-    def test_removes_decorative_fills(self):
-        svg = '<svg fill="#ff0000"><path/></svg>'
-        result = normalize_svg(svg)
-        assert "#ff0000" not in result
-
-    def test_preserves_stroke_attributes(self):
-        svg = '<svg stroke="black" stroke-width="2"><path/></svg>'
-        result = normalize_svg(svg)
-        assert 'stroke="black"' in result
-        assert 'stroke-width="2"' in result
+        assert 'fill="currentColor"' in result
+        assert 'stroke="#ff0000"' in result
 
     def test_collapses_whitespace(self):
         svg = "<svg>  \n  <path/>  \n  </svg>"
         result = normalize_svg(svg)
         assert "\n" not in result
         assert "  " not in result
-
-    def test_original_preserves_colors(self):
-        svg = '<svg fill="#ff0000" stroke="currentColor"><path/></svg>'
-        result = normalize_svg(svg, color="original")
-        assert 'fill="#ff0000"' in result
-        assert 'stroke="currentColor"' in result
 
 
 class TestSvgToDataUri:
@@ -88,10 +67,12 @@ class TestDiscoverSvgs:
         assert "hero-arrow-left" in icons
 
     def test_multiple_sets(self):
-        settings = IconxSettings(sets=[
-            IconSet("icons/"),
-            IconSet("heroicons/", prefix="hero"),
-        ])
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/"),
+                IconSet("heroicons/", prefix="hero"),
+            ],
+        )
         icons = discover_svgs(settings)
         assert "search" in icons
         assert "hero-arrow-left" in icons
@@ -102,10 +83,12 @@ class TestDiscoverSvgs:
         assert icons == {}
 
     def test_first_match_wins(self):
-        settings = IconxSettings(sets=[
-            IconSet("icons/", prefix="first"),
-            IconSet("icons/", prefix="second"),
-        ])
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/", prefix="first"),
+                IconSet("icons/", prefix="second"),
+            ],
+        )
         icons = discover_svgs(settings)
         assert "first-search" in icons
         assert "second-search" not in icons
@@ -128,6 +111,17 @@ class TestDiscoverSvgs:
         icons = discover_svgs(settings)
         assert "search" in icons
         assert "x" in icons
+
+    def test_name_collision_raises(self):
+        # icons/search.svg and dupes/search.svg both produce "search" with no prefix
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/"),
+                IconSet("dupes/"),
+            ],
+        )
+        with pytest.raises(ValueError, match=r"collision.*search"):
+            discover_svgs(settings)
 
 
 class TestDiscoverSvgVariants:

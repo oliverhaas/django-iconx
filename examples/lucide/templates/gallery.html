@@ -41,7 +41,7 @@
   <div class="gallery">
     {% for name in icons %}
     <div class="card">
-      <i class="{{ prefix }} {{ prefix }}-{{ name }}"></i>
+      <i class="{{ prefix }} {{ prefix }}-{{ name }}" aria-hidden="true"></i>
       <span class="name">{{ name }}</span>
     </div>
     {% endfor %}
