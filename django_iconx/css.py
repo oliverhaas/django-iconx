@@ -100,9 +100,7 @@ def _nearest_variant(available_sizes: list[int], target_px: int) -> int:
     return min(available_sizes, key=lambda s: abs(s - target_px))
 
 
-def _size_variant_rules(
-    prefix: str, icon_name: str, size_map: dict[int, Path], mode: str, color: str
-) -> str:
+def _size_variant_rules(prefix: str, icon_name: str, size_map: dict[int, Path], mode: str, color: str) -> str:
     """Generate text-* override rules that swap to the optimal SVG variant."""
     available = sorted(size_map)
     largest = max(available)

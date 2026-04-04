@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -94,7 +95,7 @@ def discover_icon_sets(icon_settings: IconxSettings) -> dict[str, IconSet]:
 
 
 def _scan_all_svgs() -> list[tuple[Path, str]]:
-    """Scan all STATICFILES_DIRS for SVG files.
+    """Scan all STATICFILES_DIRS for SVG files, following symlinks.
 
     Returns list of (absolute_path, relative_path_from_static_root) tuples.
     """
@@ -105,15 +106,19 @@ def _scan_all_svgs() -> list[tuple[Path, str]]:
         static_path = Path(static_dir)
         if not static_path.is_dir():
             continue
-        for svg_path in sorted(static_path.glob("**/*.svg")):
-            resolved = svg_path.resolve()
-            if resolved in seen:
-                continue
-            seen.add(resolved)
-            relative = str(svg_path.relative_to(static_path))
-            results.append((svg_path, relative))
+        for dirpath, _dirnames, filenames in os.walk(static_path, followlinks=True):
+            for filename in sorted(filenames):
+                if not filename.endswith(".svg"):
+                    continue
+                svg_path = Path(dirpath) / filename
+                resolved = svg_path.resolve()
+                if resolved in seen:
+                    continue
+                seen.add(resolved)
+                relative = str(svg_path.relative_to(static_path))
+                results.append((svg_path, relative))
 
-    return results
+    return sorted(results, key=lambda x: x[1])
 
 
 def _match_set(relative_path: str, sets: list[IconSet]) -> tuple[IconSet, str] | None:
@@ -155,7 +160,6 @@ def _remainder_to_icon_name(remainder: str, prefix: str) -> str:
         name = f"{prefix}-{name}"
 
     return name
-
 
 
 def normalize_svg(svg_content: str, *, color: str = "mono") -> str:

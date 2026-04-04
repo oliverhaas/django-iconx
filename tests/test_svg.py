@@ -88,10 +88,12 @@ class TestDiscoverSvgs:
         assert "hero-arrow-left" in icons
 
     def test_multiple_sets(self):
-        settings = IconxSettings(sets=[
-            IconSet("icons/"),
-            IconSet("heroicons/", prefix="hero"),
-        ])
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/"),
+                IconSet("heroicons/", prefix="hero"),
+            ],
+        )
         icons = discover_svgs(settings)
         assert "search" in icons
         assert "hero-arrow-left" in icons
@@ -102,10 +104,12 @@ class TestDiscoverSvgs:
         assert icons == {}
 
     def test_first_match_wins(self):
-        settings = IconxSettings(sets=[
-            IconSet("icons/", prefix="first"),
-            IconSet("icons/", prefix="second"),
-        ])
+        settings = IconxSettings(
+            sets=[
+                IconSet("icons/", prefix="first"),
+                IconSet("icons/", prefix="second"),
+            ],
+        )
         icons = discover_svgs(settings)
         assert "first-search" in icons
         assert "second-search" not in icons
