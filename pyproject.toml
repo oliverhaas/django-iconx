@@ -22,9 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
-dependencies = [
-  "Django>=5.2,<7",
-]
+dependencies = ["Django>=5.2,<7"]
 
 [project.urls]
 Homepage = "https://github.com/oliverhaas/django-iconx"
@@ -56,25 +54,27 @@ packages = ["django_iconx"]
 include = ["django_iconx", "LICENSE", "README.md"]
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py312"
 line-length = 120
 fix = true
 extend-exclude = ["examples"]
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = [
-  "COM812",
-  "D",
-  "E501",
-  "EM",
-  "TRY003",
-]
+ignore = ["COM812", "D", "E501", "EM", "TRY003"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = [
-  "ANN", "ARG", "F841", "FBT", "PT006", "PT011",
-  "PT013", "PT018", "S101", "S105",
+  "ANN",
+  "ARG",
+  "F841",
+  "FBT",
+  "PT006",
+  "PT011",
+  "PT013",
+  "PT018",
+  "S101",
+  "S105",
 ]
 
 [tool.mypy]
