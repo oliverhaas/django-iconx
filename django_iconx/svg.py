@@ -18,7 +18,6 @@ def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
     Returns a dict mapping icon class names to their SVG file paths.
     The largest size variant is used as default when size subdirectories exist.
     """
-    # Collect all icons, grouping size variants
     plain: dict[str, Path] = {}
     sized: dict[str, dict[int, Path]] = {}
 
@@ -36,7 +35,16 @@ def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
             sized[icon_name][size] = svg_path
         else:
             icon_name = _remainder_to_icon_name(remainder, icon_set.prefix)
+            if icon_name in plain:
+                msg = f"Icon name collision: '{icon_name}' produced by both '{plain[icon_name]}' and '{svg_path}'"
+                raise ValueError(msg)
             plain[icon_name] = svg_path
+
+    # Check for collisions between plain and sized icons
+    for icon_name in sized:
+        if icon_name in plain:
+            msg = f"Icon name collision: '{icon_name}' exists as both a plain icon and a sized variant"
+            raise ValueError(msg)
 
     # Merge: sized icons use the largest variant as default
     icons = dict(plain)
@@ -53,7 +61,6 @@ def discover_svg_variants(icon_settings: IconxSettings) -> dict[str, dict[int, P
     Returns a dict mapping icon names to their size variants (px -> path).
     Only includes icons with 2+ size variants.
     """
-    # First collect all SVGs with their size info
     raw: dict[str, dict[int, Path]] = {}
 
     for svg_path, relative in _scan_all_svgs():
@@ -62,7 +69,6 @@ def discover_svg_variants(icon_settings: IconxSettings) -> dict[str, dict[int, P
             continue
         icon_set, remainder = match
 
-        # Check if remainder starts with a size directory
         size, rest = _extract_size_prefix(remainder)
         if size is None:
             continue
@@ -85,7 +91,6 @@ def discover_icon_sets(icon_settings: IconxSettings) -> dict[str, IconSet]:
             continue
         icon_set, remainder = match
 
-        # Strip size prefix if present
         size, rest = _extract_size_prefix(remainder)
         name_remainder = rest if size is not None else remainder
         icon_name = _remainder_to_icon_name(name_remainder, icon_set.prefix)
@@ -151,9 +156,7 @@ def _remainder_to_icon_name(remainder: str, prefix: str) -> str:
     'search.svg' -> 'search'
     'sub/arrow-left.svg' -> 'sub-arrow-left'
     """
-    # Strip .svg extension
     name = re.sub(r"\.svg$", "", remainder)
-    # Replace path separators with dashes
     name = name.replace("/", "-").replace("\\", "-")
 
     if prefix:
@@ -162,36 +165,20 @@ def _remainder_to_icon_name(remainder: str, prefix: str) -> str:
     return name
 
 
-def normalize_svg(svg_content: str, *, color: str = "mono") -> str:
-    """Normalize SVG for CSS embedding.
+def normalize_svg(svg_content: str) -> str:
+    """Normalize SVG for data-URI embedding.
 
-    In ``mono`` mode (mask-image), colors are replaced with ``black`` so the
-    SVG works as a luminance mask driven by ``currentColor``.
-
-    In ``original`` mode (background-image), colors are preserved so the SVG
-    renders with its own fills and strokes.
-
-    Both modes strip XML declarations, comments, and metadata.
+    Strips XML declarations, comments, and metadata elements.
+    Collapses whitespace.
     """
-    # Strip XML declaration
     svg_content = re.sub(r"<\?xml[^?]*\?>", "", svg_content)
-    # Strip comments
     svg_content = re.sub(r"<!--[\s\S]*?-->", "", svg_content)
-    # Strip metadata, title, desc elements
     svg_content = re.sub(r"<(metadata|title|desc)[^>]*>[\s\S]*?</\1>", "", svg_content)
-
-    if color == "mono":
-        # Replace currentColor with black (currentColor won't resolve in data-URIs)
-        svg_content = re.sub(r'(fill|stroke)="currentColor"', r'\1="black"', svg_content)
-        # Remove decorative fills (not none, not black — those are structural/needed)
-        svg_content = re.sub(r'\s+fill="(?!none|black)[^"]*"', "", svg_content)
-
-    # Collapse whitespace
     return re.sub(r"\s+", " ", svg_content).strip()
 
 
-def svg_to_data_uri(svg_content: str, *, color: str = "mono") -> str:
+def svg_to_data_uri(svg_content: str) -> str:
     """Convert SVG content to a URL-encoded data URI (not base64)."""
-    normalized = normalize_svg(svg_content, color=color)
+    normalized = normalize_svg(svg_content)
     encoded = quote(normalized, safe="")
     return f"data:image/svg+xml,{encoded}"

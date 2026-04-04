@@ -39,15 +39,29 @@ def generate_css(
         variants = {name: v for name, v in variants.items() if name in subset}
 
     prefix = icon_settings.prefix
+
+    # Partition icons by color mode
+    mono_names = sorted(n for n in icons if icon_set_map[n].color == "mono")
+    multi_names = sorted(n for n in icons if icon_set_map[n].color == "original")
+
     lines = [_base_rule(prefix, icon_settings.size)]
 
+    # Grouped mono base selector
+    if mono_names:
+        lines.append(_mono_base_rule(prefix, mono_names))
+
+    # Grouped multi base selector
+    if multi_names:
+        lines.append(_multi_base_rule(prefix, multi_names))
+
+    # Individual icon rules
     for icon_name, svg_path in sorted(icons.items()):
         color = icon_set_map[icon_name].color
         rule = _icon_rule(prefix, icon_name, svg_path, icon_settings.mode, color)
         if rule:
             lines.append(rule)
 
-    # Generate size-variant overrides
+    # Size-variant overrides
     for icon_name, size_map in sorted(variants.items()):
         color = icon_set_map[icon_name].color
         variant_rules = _size_variant_rules(prefix, icon_name, size_map, icon_settings.mode, color)
@@ -58,40 +72,51 @@ def generate_css(
 
 
 def _base_rule(prefix: str, size: str) -> str:
-    return f""".{prefix}::before {{
+    return f""".{prefix} {{
   display: inline-block;
   width: {size};
   height: {size};
-  content: "";
-  background: currentColor;
-  vertical-align: middle;
+  vertical-align: -0.125em;
+  line-height: 1;
+}}"""
+
+
+def _mono_base_rule(prefix: str, icon_names: list[str]) -> str:
+    selectors = ",\n".join(f".{prefix}-{name}" for name in icon_names)
+    return f"""
+{selectors} {{
+  background-color: currentColor;
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
+  mask-mode: alpha;
+}}"""
+
+
+def _multi_base_rule(prefix: str, icon_names: list[str]) -> str:
+    selectors = ",\n".join(f".{prefix}-{name}" for name in icon_names)
+    return f"""
+{selectors} {{
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }}"""
 
 
 def _icon_rule(prefix: str, icon_name: str, svg_path: Path, mode: str, color: str) -> str | None:
+    url = _svg_url(svg_path, mode)
+    if url is None:
+        return None
+    prop = "background-image" if color == "original" else "mask-image"
+    return f'\n.{prefix}-{icon_name} {{ {prop}: url("{url}"); }}'
+
+
+def _svg_url(svg_path: Path, mode: str) -> str | None:
     if mode == "data_uri":
         svg_content = svg_path.read_text(encoding="utf-8")
-        data_uri = svg_to_data_uri(svg_content, color=color)
-        if color == "original":
-            return f"""\n.{prefix}-{icon_name}::before {{
-  background: url("{data_uri}") no-repeat center / contain;
-  mask-image: none;
-}}"""
-        return f"""\n.{prefix}-{icon_name}::before {{
-  mask-image: url("{data_uri}");
-}}"""
+        return svg_to_data_uri(svg_content)
     if mode == "url":
-        if color == "original":
-            return f"""\n.{prefix}-{icon_name}::before {{
-  background: url("{svg_path.name}") no-repeat center / contain;
-  mask-image: none;
-}}"""
-        return f"""\n.{prefix}-{icon_name}::before {{
-  mask-image: url("{svg_path.name}");
-}}"""
+        return svg_path.name
     return None
 
 
@@ -100,7 +125,13 @@ def _nearest_variant(available_sizes: list[int], target_px: int) -> int:
     return min(available_sizes, key=lambda s: abs(s - target_px))
 
 
-def _size_variant_rules(prefix: str, icon_name: str, size_map: dict[int, Path], mode: str, color: str) -> str:
+def _size_variant_rules(
+    prefix: str,
+    icon_name: str,
+    size_map: dict[int, Path],
+    mode: str,
+    color: str,
+) -> str:
     """Generate text-* override rules that swap to the optimal SVG variant."""
     available = sorted(size_map)
     largest = max(available)
@@ -110,7 +141,6 @@ def _size_variant_rules(prefix: str, icon_name: str, size_map: dict[int, Path], 
     for text_class, font_px in TEXT_SIZES:
         best = _nearest_variant(available, font_px)
         if best == largest:
-            # Default rule already uses the largest — no override needed
             continue
         if best not in variant_to_classes:
             variant_to_classes[best] = []
@@ -119,24 +149,16 @@ def _size_variant_rules(prefix: str, icon_name: str, size_map: dict[int, Path], 
     if not variant_to_classes:
         return ""
 
-    prop = "background" if color == "original" else "mask-image"
+    prop = "background-image" if color == "original" else "mask-image"
     rules: list[str] = []
     for size_px, text_classes in sorted(variant_to_classes.items()):
-        svg_path = size_map[size_px]
-        if mode == "data_uri":
-            svg_content = svg_path.read_text(encoding="utf-8")
-            data_uri = svg_to_data_uri(svg_content, color=color)
-            url_value = f'url("{data_uri}")'
-        elif mode == "url":
-            url_value = f'url("{svg_path.name}")'
-        else:
+        url = _svg_url(size_map[size_px], mode)
+        if url is None:
             continue
 
-        css_value = f"{url_value} no-repeat center / contain" if color == "original" else url_value
-
-        selectors = ",\n".join(f".{tc}.{prefix}-{icon_name}::before" for tc in text_classes)
+        selectors = ",\n".join(f".{tc}.{prefix}-{icon_name}" for tc in text_classes)
         rules.append(f"""\n{selectors} {{
-  {prop}: {css_value};
+  {prop}: url("{url}");
 }}""")
 
     return "\n".join(rules)

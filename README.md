@@ -11,43 +11,55 @@ Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or yo
 ## Usage
 
 ```html
-<!-- standalone icon -->
-<i class="icon icon-search"></i>
+<!-- basic icon -->
+<i class="icon icon-search" aria-hidden="true"></i>
 
-<!-- composes naturally with daisyUI buttons (or any flexbox container) -->
-<button class="btn btn-primary icon icon-search">Search</button>
+<!-- sized via Tailwind text-* (width/height = 1em, so font-size controls size) -->
+<i class="icon icon-check text-2xl" aria-hidden="true"></i>
 
-<!-- icon-only button -->
-<button class="btn btn-primary btn-square icon icon-search"></button>
+<!-- colored via Tailwind text-* (mono icons only, via currentColor mask trick) -->
+<i class="icon icon-check text-2xl text-green-500" aria-hidden="true"></i>
+
+<!-- multi-color icon (preserves original SVG colors) -->
+<i class="icon icon-logo text-4xl" aria-hidden="true"></i>
 ```
 
 ## How it works
 
-Each icon becomes a CSS class using `mask-image` on a `::before` pseudo-element:
+Mono icons use `mask-image` + `background-color: currentColor` — the SVG acts as a mask, so the icon inherits text color. Multi-color icons use `background-image` to render the SVG as-is.
 
 ```css
-.icon::before {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  content: "";
-  background: currentColor;
+/* base: all icons */
+.icon { display: inline-block; width: 1em; height: 1em; }
+
+/* mono icons: grouped selector */
+.icon-search, .icon-check, ... {
+  background-color: currentColor;
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
+  mask-mode: alpha;
 }
 
-.icon-search::before {
-  mask-image: url("data:image/svg+xml,...");
+/* individual mask per icon */
+.icon-search { mask-image: url('/static/icons/mono/search.svg'); }
+
+/* multi-color icons: grouped selector */
+.icon-logo, .icon-badge, ... {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
+
+.icon-logo { background-image: url('/static/icons/multi/logo.svg'); }
 ```
 
 Key design choices:
-- **`currentColor`** — icons inherit text color automatically
-- **`1em` sizing** — icons scale with font size
-- **`::before` pseudo-element** — participates in flexbox layout, composes with buttons/badges/etc.
-- **Data URIs** — no external requests, everything in one CSS file
-- **Tree-shakeable** — only the icons you use end up in the output (via Tailwind/PurgeCSS scanning)
+- **`currentColor`** — mono icons inherit text color automatically
+- **`1em` sizing** — icons scale with font size via Tailwind `text-*` classes
+- **`mask-mode: alpha`** — SVG alpha channel drives the mask, fill colors are irrelevant
+- **Direct element styling** — no `::before` pseudo-element, simpler CSS
+- **Tree-shakeable** — PurgeCSS strips unused `.icon-*` rules from the generated CSS
 
 ## Browser support
 

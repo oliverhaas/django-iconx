@@ -54,7 +54,11 @@ class Command(BaseCommand):
             subset = {s.strip() for s in options["subset"].split(",")}
 
         # Discover icons
-        icons = discover_svgs(icon_settings)
+        try:
+            icons = discover_svgs(icon_settings)
+        except ValueError as e:
+            self.stderr.write(self.style.ERROR(str(e)))
+            return
         if not icons:
             self.stderr.write(self.style.WARNING("No SVG icons found in configured sets."))
             return
@@ -73,5 +77,5 @@ class Command(BaseCommand):
 
         icon_count = len(icons) if subset is None else len(subset & set(icons.keys()))
         self.stdout.write(
-            self.style.SUCCESS(f"Generated {output_path} with {icon_count} icons ({icon_settings.mode} mode)")
+            self.style.SUCCESS(f"Generated {output_path} with {icon_count} icons ({icon_settings.mode} mode)"),
         )
