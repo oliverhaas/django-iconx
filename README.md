@@ -42,7 +42,7 @@ Mono icons use `mask-image` + `background-color: currentColor` — the SVG acts 
 }
 
 /* individual mask per icon */
-.icon-search { mask-image: url('/static/icons/mono/search.svg'); }
+.icon-search { mask-image: url("/static/icons/search.svg"); }
 
 /* multi-color icons: grouped selector */
 .icon-logo, .icon-badge, ... {
@@ -51,7 +51,7 @@ Mono icons use `mask-image` + `background-color: currentColor` — the SVG acts 
   background-position: center;
 }
 
-.icon-logo { background-image: url('/static/icons/multi/logo.svg'); }
+.icon-logo { background-image: url("/static/logos/logo.svg"); }
 ```
 
 Key design choices:

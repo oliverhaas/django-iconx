@@ -25,6 +25,16 @@ class TestIconTag:
         assert 'role="img"' in html
         assert "aria-hidden" not in html
 
+    def test_data_attributes(self):
+        html = self._render('{% load iconx %}{% icon "search" data_controller="icon" data_value="1" %}')
+        assert 'data-controller="icon"' in html
+        assert 'data-value="1"' in html
+
+    def test_escapes_attribute_values(self):
+        html = self._render('{% load iconx %}{% icon "search" data_val="<script>" %}')
+        assert "&lt;script&gt;" in html
+        assert "<script>" not in html
+
     @override_settings(ICONX={"prefix": "icn"})
     def test_custom_prefix(self):
         html = self._render('{% load iconx %}{% icon "search" %}')

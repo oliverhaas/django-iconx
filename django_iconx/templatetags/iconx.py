@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from typing import Any
+
 from django import template
+from django.conf import settings
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 
-from django_iconx.conf import get_settings
-
 register = template.Library()
+
+_DEFAULT_PREFIX = "icon"
 
 
 @register.simple_tag
@@ -19,7 +22,8 @@ def icon(name: str, **kwargs: str) -> str:
         {% icon "search" class="text-lg" %}
         {% icon "warning" aria_label="Warning" %}
     """
-    prefix = get_settings().prefix
+    raw: dict[str, Any] = getattr(settings, "ICONX", {})
+    prefix = raw.get("prefix", _DEFAULT_PREFIX)
     classes = f"{prefix} {prefix}-{name}"
 
     extra_class = kwargs.pop("class", "")
