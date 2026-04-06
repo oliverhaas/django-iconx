@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from django_iconx.conf import IconSet, IconxSettings
 
 
-@dataclass(frozen=True)
+@dataclass
 class DiscoveredIcons:
     """Result of a single discovery pass over all configured icon sets."""
 
@@ -98,23 +98,6 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
         variant_relatives=variant_rels,
         icon_sets=icon_set_map,
     )
-
-
-def discover_svgs(icon_settings: IconxSettings) -> dict[str, Path]:
-    """Discover SVG files by scanning static dirs and matching against set regexes.
-
-    Returns a dict mapping icon class names to their SVG file paths.
-    """
-    return discover(icon_settings).icons
-
-
-def discover_svg_variants(icon_settings: IconxSettings) -> dict[str, dict[int, Path]]:
-    """Discover icons that have multiple size variants.
-
-    Returns a dict mapping icon names to their size variants (px -> path).
-    Only includes icons with 2+ size variants.
-    """
-    return discover(icon_settings).variants
 
 
 def _scan_all_svgs() -> list[tuple[Path, str]]:
