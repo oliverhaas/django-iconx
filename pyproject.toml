@@ -1,6 +1,6 @@
 [project]
 name = "django-iconx"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "CSS-only icon system for Django"
 readme = "README.md"
 license = { text = "MIT" }
@@ -11,6 +11,7 @@ classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "Framework :: Django",
   "Framework :: Django :: 5.2",
+  "Framework :: Django :: 6.0",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",

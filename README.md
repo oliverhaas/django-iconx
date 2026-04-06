@@ -6,7 +6,9 @@
 
 CSS-only icon system for Django.
 
-Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or your own SVGs). Icons are rendered purely via CSS — no JavaScript, no icon fonts, no template tags needed.
+![django-iconx demo](docs/assets/demo.png)
+
+Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or your own SVGs). Icons are rendered purely via CSS, no JavaScript or icon fonts needed. A template tag is included for convenience but not required.
 
 ## Usage
 
@@ -26,7 +28,7 @@ Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or yo
 
 ## How it works
 
-Mono icons use `mask-image` + `background-color: currentColor` — the SVG acts as a mask, so the icon inherits text color. Multi-color icons use `background-image` to render the SVG as-is.
+Mono icons use `mask-image` with `background-color: currentColor`, so the SVG acts as a mask and the icon inherits text color. Multi-color icons use `background-image` to render the SVG as-is.
 
 ```css
 /* base: all icons */
@@ -55,17 +57,17 @@ Mono icons use `mask-image` + `background-color: currentColor` — the SVG acts 
 ```
 
 Key design choices:
-- **`currentColor`** — mono icons inherit text color automatically
-- **`1em` sizing** — icons scale with font size via Tailwind `text-*` classes
-- **`mask-mode: alpha`** — SVG alpha channel drives the mask, fill colors are irrelevant
-- **Direct element styling** — no `::before` pseudo-element, simpler CSS
-- **Tree-shakeable** — PurgeCSS strips unused `.icon-*` rules from the generated CSS
+- **`currentColor`**: mono icons inherit text color automatically
+- **`1em` sizing**: icons scale with font size via Tailwind `text-*` classes
+- **`mask-mode: alpha`**: SVG alpha channel drives the mask, fill colors are irrelevant
+- **Direct element styling**: no `::before` pseudo-element, simpler CSS
+- **Tree-shakeable**: PurgeCSS strips unused `.icon-*` rules from the generated CSS
 
 ## Browser support
 
 django-iconx uses CSS `mask-image`, which is supported unprefixed in all modern browsers since December 2023 (~97% global coverage). Older browsers (Chrome < 120, Safari < 15.4) need the `-webkit-mask-image` prefix.
 
-Tailwind v4 handles vendor prefixing automatically — just `@import` the generated CSS file in your Tailwind entry point:
+Tailwind v4 handles vendor prefixing automatically. Just `@import` the generated CSS file in your Tailwind entry point:
 
 ```css
 @import "tailwindcss";

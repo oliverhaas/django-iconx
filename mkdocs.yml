@@ -43,5 +43,6 @@ nav:
   - Home: index.md
   - Getting Started:
       - Installation: getting-started/installation.md
+      - Icon Packages: getting-started/icon-packages.md
   - Reference:
       - Changelog: reference/changelog.md

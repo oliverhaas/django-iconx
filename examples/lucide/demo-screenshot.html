@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>django-iconx demo</title>
+<link rel="stylesheet" href="static/iconx/icons.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    overflow: hidden;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: transparent;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 0;
+  }
+  .card {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 40px 48px;
+    max-width: 720px;
+    width: 100%;
+  }
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #f8fafc;
+  }
+  .subtitle {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-bottom: 36px;
+  }
+  .section {
+    margin-bottom: 32px;
+  }
+  .section:last-child {
+    margin-bottom: 0;
+  }
+  .label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 12px;
+  }
+  .row {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* Gradient icons — override background-color with a gradient */
+  .icon-gradient-pink {
+    background: linear-gradient(135deg, #ec4899, #a855f7) !important;
+  }
+  .icon-gradient-blue {
+    background: linear-gradient(135deg, #38bdf8, #818cf8) !important;
+  }
+  .icon-gradient-green {
+    background: linear-gradient(135deg, #34d399, #22d3ee) !important;
+  }
+  .icon-gradient-orange {
+    background: linear-gradient(135deg, #fb923c, #f472b6) !important;
+  }
+  .icon-gradient-violet {
+    background: linear-gradient(135deg, #a78bfa, #f472b6) !important;
+  }
+  .icon-gradient-cyan {
+    background: linear-gradient(135deg, #22d3ee, #38bdf8) !important;
+  }
+  .icon-gradient-warm {
+    background: linear-gradient(135deg, #fbbf24, #f97316, #ef4444) !important;
+  }
+  .icon-gradient-cool {
+    background: linear-gradient(135deg, #06b6d4, #8b5cf6) !important;
+  }
+
+  /* Solid color icons */
+  .text-sky { color: #38bdf8; }
+  .text-rose { color: #fb7185; }
+  .text-amber { color: #fbbf24; }
+  .text-emerald { color: #34d399; }
+  .text-violet { color: #a78bfa; }
+  .text-orange { color: #fb923c; }
+
+  /* Sizes */
+  .text-xl { font-size: 1.25rem; }
+  .text-2xl { font-size: 1.5rem; }
+  .text-3xl { font-size: 1.875rem; }
+  .text-4xl { font-size: 2.25rem; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>django-iconx</h1>
+  <p class="subtitle">CSS-only icons with gradient support via mask-image</p>
+
+  <div class="section">
+    <div class="label">Gradient icons</div>
+    <div class="row">
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-zap icon-gradient-orange" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-star icon-gradient-warm" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-rocket icon-gradient-blue" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-sparkles icon-gradient-violet" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-flame icon-gradient-orange" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-gem icon-gradient-cyan" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-crown icon-gradient-warm" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-shield icon-gradient-green" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-globe icon-gradient-cool" style="font-size:2.25rem" aria-hidden="true"></i>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Solid colors</div>
+    <div class="row">
+      <i class="icon icon-sun text-amber" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-moon text-violet" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-cloud text-sky" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-music text-rose" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-camera text-emerald" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-palette text-orange" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-coffee text-amber" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-compass text-sky" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-wand text-violet" style="font-size:1.75rem" aria-hidden="true"></i>
+      <i class="icon icon-bolt text-amber" style="font-size:1.75rem" aria-hidden="true"></i>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Scales with font size</div>
+    <div class="row" style="align-items: flex-end;">
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:0.75rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:1rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:1.25rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:1.5rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:1.875rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:2.25rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:3rem" aria-hidden="true"></i>
+      <i class="icon icon-heart icon-gradient-pink" style="font-size:3.75rem" aria-hidden="true"></i>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Just CSS — no JavaScript, no icon fonts</div>
+    <div style="font-size:0.8rem; color:#64748b; font-family: 'SF Mono', 'Fira Code', monospace;">
+      .icon-heart { mask-image: url("data:image/svg+xml,..."); }
+    </div>
+  </div>
+</div>
+</body>
+</html>

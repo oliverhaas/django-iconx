@@ -7,9 +7,9 @@ from django.conf import settings
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 
-register = template.Library()
+from django_iconx.conf import DEFAULT_PREFIX
 
-_DEFAULT_PREFIX = "icon"
+register = template.Library()
 
 
 @register.simple_tag
@@ -23,7 +23,7 @@ def icon(name: str, **kwargs: str) -> str:
         {% icon "warning" aria_label="Warning" %}
     """
     raw: dict[str, Any] = getattr(settings, "ICONX", {})
-    prefix = raw.get("prefix", _DEFAULT_PREFIX)
+    prefix = raw.get("prefix", DEFAULT_PREFIX)
     classes = f"{prefix} {prefix}-{name}"
 
     extra_class = kwargs.pop("class", "")
@@ -43,5 +43,6 @@ def icon(name: str, **kwargs: str) -> str:
         attr_name = key.replace("_", "-")
         attrs_parts.append(f'{attr_name}="{escape(value)}"')
 
+    # Safe: each value is individually escaped above
     attrs = mark_safe(" ".join(attrs_parts))  # noqa: S308
     return format_html('<i class="{}" {}></i>', classes, attrs)

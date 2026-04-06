@@ -33,9 +33,9 @@ Generate the CSS:
 python manage.py iconx_generate
 ```
 
-Use one set or many -- just add or remove entries from the list. Use `"prefix"` to namespace sets and avoid name collisions. Use `"color": "original"` for multi-color SVGs that should preserve their fill colors.
+Use one set or many, just add or remove entries from the list. Use `"prefix"` to namespace sets and avoid name collisions. Use `"color": "original"` for multi-color SVGs that should preserve their fill colors.
 
-The source doesn't matter -- npm packages, downloaded zips, your own SVGs. The only requirement is that the directory is reachable from `STATICFILES_DIRS`.
+The source doesn't matter: npm packages, downloaded zips, your own SVGs. The only requirement is that the directory is reachable from `STATICFILES_DIRS`.
 
 ## Pre-commit hook
 

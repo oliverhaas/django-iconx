@@ -7,6 +7,7 @@ from django.conf import settings
 
 VALID_MODES = ("data_uri", "url")
 VALID_COLORS = ("mono", "original")
+DEFAULT_PREFIX = "icon"
 
 
 @dataclass(frozen=True)
@@ -26,7 +27,7 @@ class IconxSettings:
     sets: list[IconSet] = field(default_factory=lambda: [IconSet("icons/")])
     output: str = "static/iconx/icons.css"
     mode: str = "url"
-    prefix: str = "icon"
+    prefix: str = DEFAULT_PREFIX
     size: str = "1em"
 
     def __post_init__(self) -> None:
