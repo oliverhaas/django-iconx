@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://oliverhaas.github.io/django-iconx/main/getting-started/installation/">
+        <link rel="canonical" href="https://oliverhaas.github.io/django-iconx/main/getting-started/icon-packages/">
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../installation/">
       
       
-        <link rel="next" href="../icon-packages/">
+        <link rel="next" href="../../reference/changelog/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Installation - django-iconx</title>
+        <title>Icon Packages - django-iconx</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation" class="md-skip">
+        <a href="#using-icon-packages" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Installation
+              Icon Packages
             
           </span>
         </div>
@@ -342,19 +342,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
         
   
   
@@ -370,7 +361,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -380,10 +370,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../icon-packages/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Icon Packages
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -399,6 +416,70 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#lucide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lucide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heroicons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heroicons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-icon-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple icon sets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#any-svg-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Any SVG directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -518,6 +599,58 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#lucide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lucide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heroicons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heroicons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-icon-sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multiple icon sets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#any-svg-directory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Any SVG directory
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -536,9 +669,65 @@
   
 
 
-<h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">pip install django-iconx</span>
+<h1 id="using-icon-packages">Using Icon Packages<a class="headerlink" href="#using-icon-packages" title="Permanent link">&para;</a></h1>
+<p>django-iconx works with any SVG icon set. Point your <code>ICONX</code> config at a directory of <code>.svg</code> files and run <code>iconx_generate</code>.</p>
+<h2 id="lucide">Lucide<a class="headerlink" href="#lucide" title="Permanent link">&para;</a></h2>
+<p><a href="https://lucide.dev/">Lucide</a> is a community-maintained fork of Feather Icons with 1500+ icons.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="go">npm install lucide-static</span>
 </code></pre></div>
+<p>Then symlink or copy the icons into your static directory:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="go">mkdir -p static/icons</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="go">ln -s ../../node_modules/lucide-static/icons static/icons/lucide</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span><span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">&quot;static&quot;</span><span class="p">]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">ICONX</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;icons/lucide/&quot;</span><span class="p">},</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="p">],</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">python manage.py iconx_generate</span>
+</code></pre></div>
+<p>This gives you classes like <code>icon-search</code>, <code>icon-arrow-left</code>, <code>icon-check</code>, etc.</p>
+<h2 id="heroicons">Heroicons<a class="headerlink" href="#heroicons" title="Permanent link">&para;</a></h2>
+<p><a href="https://heroicons.com/">Heroicons</a> by the Tailwind team provides outline, solid, and mini variants.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="go">npm install heroicons</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="go">mkdir -p static/icons</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="go">ln -s ../../node_modules/heroicons/24/outline static/icons/heroicons</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">ICONX</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;icons/heroicons/&quot;</span><span class="p">,</span> <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;hero&quot;</span><span class="p">},</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="p">],</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+</code></pre></div>
+<p>Icons are available as <code>icon-hero-arrow-left</code>, <code>icon-hero-check</code>, etc. Use the prefix to avoid name collisions if you use multiple icon sets.</p>
+<h2 id="multiple-icon-sets">Multiple icon sets<a class="headerlink" href="#multiple-icon-sets" title="Permanent link">&para;</a></h2>
+<p>You can combine icon sets and assign each a prefix:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">ICONX</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;icons/lucide/&quot;</span><span class="p">},</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;icons/heroicons/&quot;</span><span class="p">,</span> <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;hero&quot;</span><span class="p">},</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;icons/custom/&quot;</span><span class="p">,</span> <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;original&quot;</span><span class="p">},</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="p">],</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li>Icons without a prefix use the icon name directly: <code>icon-search</code></li>
+<li>Prefixed icons get the prefix prepended: <code>icon-hero-search</code>, <code>icon-custom-logo</code></li>
+<li>Use <code>"color": "original"</code> for multi-color SVGs that should preserve their fill colors</li>
+</ul>
+<h2 id="any-svg-directory">Any SVG directory<a class="headerlink" href="#any-svg-directory" title="Permanent link">&para;</a></h2>
+<p>django-iconx doesn't care where the SVGs come from. You can:</p>
+<ul>
+<li>Install an npm package and symlink its icons directory</li>
+<li>Download SVGs manually into your static directory</li>
+<li>Use your own custom SVGs</li>
+<li>Mix and match any of the above</li>
+</ul>
+<p>The only requirement is that the SVGs are reachable from a directory listed in <code>STATICFILES_DIRS</code>, and that the <code>sets</code> paths match.</p>
 
 
 
