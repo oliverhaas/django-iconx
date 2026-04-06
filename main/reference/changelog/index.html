@@ -518,10 +518,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#010a1-unreleased" class="md-nav__link">
+  <a href="#010a2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0.1.0a1 (Unreleased)
+        0.1.0a2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010a1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.0a1
       
     </span>
   </a>
@@ -571,10 +582,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#010a1-unreleased" class="md-nav__link">
+  <a href="#010a2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        0.1.0a1 (Unreleased)
+        0.1.0a2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#010a1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1.0a1
       
     </span>
   </a>
@@ -602,7 +624,19 @@
 
 
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
-<h2 id="010a1-unreleased">0.1.0a1 (Unreleased)<a class="headerlink" href="#010a1-unreleased" title="Permanent link">&para;</a></h2>
+<h2 id="010a2">0.1.0a2<a class="headerlink" href="#010a2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>CSS generation from SVG icon sources via <code>iconx_generate</code> management command</li>
+<li>Two embedding modes: <code>data_uri</code> (inline) and <code>url</code> (external, with <code>STATIC_URL</code> prefix)</li>
+<li>Multiple icon sets with configurable prefixes and regex-based path matching</li>
+<li>Mono icons via <code>mask-image</code> + <code>currentColor</code>, multi-color icons via <code>background-image</code></li>
+<li>Automatic size variant detection from numbered subdirectories (e.g. <code>16/</code>, <code>24/</code>)</li>
+<li>Tailwind <code>text-*</code> class overrides that swap to the nearest size variant</li>
+<li><code>{% icon %}</code> template tag with accessibility defaults and attribute pass-through</li>
+<li><code>--subset</code>, <code>--dry-run</code>, <code>--skip-name-collisions</code> CLI flags</li>
+<li>Django 5.2 and 6.0 support, Python 3.12+</li>
+</ul>
+<h2 id="010a1">0.1.0a1<a class="headerlink" href="#010a1" title="Permanent link">&para;</a></h2>
 <p>Initial release.</p>
 
 
