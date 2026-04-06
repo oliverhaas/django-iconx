@@ -648,8 +648,8 @@
 <p>Generate the CSS:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">python manage.py iconx_generate</span>
 </code></pre></div>
-<p>Use one set or many -- just add or remove entries from the list. Use <code>"prefix"</code> to namespace sets and avoid name collisions. Use <code>"color": "original"</code> for multi-color SVGs that should preserve their fill colors.</p>
-<p>The source doesn't matter -- npm packages, downloaded zips, your own SVGs. The only requirement is that the directory is reachable from <code>STATICFILES_DIRS</code>.</p>
+<p>Use one set or many, just add or remove entries from the list. Use <code>"prefix"</code> to namespace sets and avoid name collisions. Use <code>"color": "original"</code> for multi-color SVGs that should preserve their fill colors.</p>
+<p>The source doesn't matter: npm packages, downloaded zips, your own SVGs. The only requirement is that the directory is reachable from <code>STATICFILES_DIRS</code>.</p>
 <h2 id="pre-commit-hook">Pre-commit hook<a class="headerlink" href="#pre-commit-hook" title="Permanent link">&para;</a></h2>
 <p>To keep the generated CSS in sync, add <code>iconx_generate</code> as a pre-commit hook:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># .pre-commit-config.yaml</span>
