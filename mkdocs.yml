@@ -45,4 +45,5 @@ nav:
       - Installation: getting-started/installation.md
       - Icon Packages: getting-started/icon-packages.md
   - Reference:
+      - Configuration: reference/configuration.md
       - Changelog: reference/changelog.md

@@ -79,7 +79,7 @@ With vendor prefixes applied, the only unsupported browsers are pre-Chromium Edg
 ## Installation
 
 ```console
-pip install django-iconx
+uv add django-iconx
 ```
 
 ## Documentation

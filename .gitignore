@@ -17,4 +17,5 @@ site/
 *.sqlite3
 .DS_Store
 node_modules/
+.playwright-mcp/
 examples/*/static/

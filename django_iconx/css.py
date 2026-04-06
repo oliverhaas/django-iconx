@@ -64,9 +64,7 @@ def generate_css(
     # Individual icon rules
     for icon_name in sorted(icons):
         color = icon_set_map[icon_name].color
-        rule = _icon_rule(prefix, icon_name, icons[icon_name], discovered.relatives[icon_name], mode, color)
-        if rule:
-            lines.append(rule)
+        lines.append(_icon_rule(prefix, icon_name, icons[icon_name], discovered.relatives[icon_name], mode, color))
 
     # Size-variant overrides
     for icon_name in sorted(variants):
@@ -117,22 +115,19 @@ def _multi_base_rule(prefix: str, icon_names: list[str]) -> str:
 }}"""
 
 
-def _icon_rule(prefix: str, icon_name: str, svg_path: Path, relative: str, mode: str, color: str) -> str | None:  # noqa: PLR0913
+def _icon_rule(prefix: str, icon_name: str, svg_path: Path, relative: str, mode: str, color: str) -> str:  # noqa: PLR0913
     url = _svg_url(svg_path, relative, mode)
-    if url is None:
-        return None
     prop = "background-image" if color == "original" else "mask-image"
     return f'\n.{prefix}-{icon_name} {{ {prop}: url("{url}"); }}'
 
 
-def _svg_url(svg_path: Path, relative: str, mode: str) -> str | None:
+def _svg_url(svg_path: Path, relative: str, mode: str) -> str:
     if mode == "data_uri":
         svg_content = svg_path.read_text(encoding="utf-8")
         return svg_to_data_uri(svg_content)
-    if mode == "url":
-        static_url = getattr(settings, "STATIC_URL", None) or "/static/"
-        return f"{static_url}{relative}"
-    return None
+    # mode == "url" (validated by IconxSettings.__post_init__)
+    static_url = getattr(settings, "STATIC_URL", None) or "/static/"
+    return f"{static_url}{relative}"
 
 
 def _nearest_variant(available_sizes: list[int], target_px: int) -> int:
@@ -169,9 +164,6 @@ def _size_variant_rules(  # noqa: PLR0913
     rules: list[str] = []
     for size_px, text_classes in sorted(variant_to_classes.items()):
         url = _svg_url(size_map[size_px], size_relatives[size_px], mode)
-        if url is None:
-            continue
-
         selectors = ",\n".join(f".{tc}.{prefix}-{icon_name}" for tc in text_classes)
         rules.append(f"""\n{selectors} {{
   {prop}: url("{url}");
