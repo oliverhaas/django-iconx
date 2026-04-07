@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0
+
+- `iconx add <package>` command: download icon packages (Lucide, Heroicons, Tabler, Phosphor, Bootstrap) directly from GitHub
+- Style filtering: `iconx add heroicons/24`, `iconx add tabler/outline`
+- Version pinning: `iconx add lucide --version v1.7.0`
+- Auto-generates CSS after download (skip with `--no-generate`)
+- **Breaking**: `iconx_generate` renamed to `iconx generate`
+
 ## 0.1.0a2
 
 - CSS generation from SVG icon sources via `iconx_generate` management command

@@ -2,11 +2,11 @@
 
 CSS-only icon system for Django.
 
-Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or your own SVGs). Icons are rendered purely via CSS. No JavaScript or icon fonts needed.
+Generates a single CSS file from SVG icon sources. No JavaScript or icon fonts needed. Built-in support for Lucide, Heroicons, Tabler, Phosphor, and Bootstrap Icons.
 
 ```html
-<i class="icon icon-search" aria-hidden="true"></i>
-<i class="icon icon-check text-2xl text-green-500" aria-hidden="true"></i>
+<i class="icon icon-lucide-search"></i>
+<i class="icon icon-lucide-check text-2xl text-green-500"></i>
 ```
 
 Mono icons use `mask-image` with `currentColor`, so they inherit text color and scale with font size via Tailwind `text-*` classes. Multi-color icons use `background-image` to preserve original SVG colors.
@@ -24,14 +24,17 @@ INSTALLED_APPS = [
 ]
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
-ICONX = {
-    "sets": ["icons/"],
-}
 ```
 
 ```console
-python manage.py iconx_generate
+python manage.py iconx add lucide
+```
+
+That downloads the icons and generates the CSS. Include it in your template or Tailwind entry point:
+
+```css
+@import "tailwindcss";
+@import "./static/iconx/icons.css";
 ```
 
 See [Installation](getting-started/installation.md) for the full setup guide.
