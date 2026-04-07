@@ -1,6 +1,6 @@
 [project]
 name = "django-iconx"
-version = "0.1.0a3"
+version = "0.1.0"
 description = "CSS-only icon system for Django"
 readme = "README.md"
 license = { text = "MIT" }

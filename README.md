@@ -19,7 +19,7 @@ Generates a single CSS file from SVG icon sources (Lucide, Heroicons, or your ow
 
 ## How it works and what the upsides are
 
-Mono icons use `mask-image` with `background-color: currentColor` -- the SVG acts as a mask and the icon inherits text color. Multi-color icons use `background-image` to preserve original SVG colors.
+Mono icons use `mask-image` with `background-color: currentColor`, so the SVG acts as a mask and the icon inherits text color. Multi-color icons use `background-image` to preserve original SVG colors.
 
 The output is plain CSS classes: no runtime, no bundler plugin, no framework coupling. The approach is not Django-specific; Django is just a good fit because its static file conventions make wiring it up easy. Any stack that serves CSS and renders HTML can use the generated stylesheet directly.
 

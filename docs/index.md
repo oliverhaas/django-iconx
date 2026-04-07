@@ -2,7 +2,7 @@
 
 CSS-only icon system for Django.
 
-Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or your own SVGs). Icons are rendered purely via CSS -- no JavaScript or icon fonts needed.
+Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or your own SVGs). Icons are rendered purely via CSS. No JavaScript or icon fonts needed.
 
 ```html
 <i class="icon icon-search" aria-hidden="true"></i>
