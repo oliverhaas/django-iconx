@@ -8,7 +8,6 @@
 - Mono icons via `mask-image` + `currentColor`, multi-color icons via `background-image`
 - Automatic size variant detection from numbered subdirectories (e.g. `16/`, `24/`)
 - Tailwind `text-*` class overrides that swap to the nearest size variant
-- `{% icon %}` template tag with accessibility defaults and attribute pass-through
 - `--subset`, `--dry-run`, `--skip-name-collisions` CLI flags
 - Django 5.2 and 6.0 support, Python 3.12+
 

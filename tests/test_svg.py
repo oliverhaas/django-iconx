@@ -165,3 +165,25 @@ class TestDiscover:
         settings = IconxSettings(sets=[IconSet("icons/")])
         discovered = discover(settings)
         assert discovered.icon_sets["search"].color == "mono"
+
+    def test_sized_collision_raises(self):
+        settings = IconxSettings(
+            sets=[
+                IconSet("sized/"),
+                IconSet("sized_dupes/"),
+            ],
+        )
+        with pytest.raises(ValueError, match=r"collision.*search.*size 16"):
+            discover(settings)
+
+    def test_sized_collision_skip_warns_and_keeps_first(self, caplog):
+        settings = IconxSettings(
+            sets=[
+                IconSet("sized/"),
+                IconSet("sized_dupes/"),
+            ],
+        )
+        with caplog.at_level(logging.WARNING, logger="django_iconx"):
+            discovered = discover(settings, skip_collisions=True)
+        assert "collision" in caplog.text.lower()
+        assert "search" in discovered.icons

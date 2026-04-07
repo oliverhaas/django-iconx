@@ -11,8 +11,6 @@ Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or yo
 
 Mono icons use `mask-image` with `currentColor`, so they inherit text color and scale with font size via Tailwind `text-*` classes. Multi-color icons use `background-image` to preserve original SVG colors.
 
-A `{% icon %}` template tag is included for convenience but not required -- the CSS classes work standalone.
-
 ## Quick start
 
 ```console

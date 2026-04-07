@@ -27,7 +27,7 @@ class DiscoveredIcons:
     icon_sets: dict[str, IconSet] = field(default_factory=dict)
 
 
-def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> DiscoveredIcons:  # noqa: C901
+def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> DiscoveredIcons:  # noqa: C901, PLR0912
     """Discover all SVG icons in a single filesystem scan.
 
     Returns a DiscoveredIcons with icons, their relative paths, size variants,
@@ -54,6 +54,12 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
             if icon_name not in sized:
                 sized[icon_name] = {}
                 sized_rel[icon_name] = {}
+            if size in sized[icon_name]:
+                msg = f"Icon name collision: '{icon_name}' size {size} produced by both '{sized[icon_name][size]}' and '{svg_path}'"
+                if not skip_collisions:
+                    raise ValueError(msg)
+                logger.warning(msg)
+                continue
             sized[icon_name][size] = svg_path
             sized_rel[icon_name][size] = relative
         else:

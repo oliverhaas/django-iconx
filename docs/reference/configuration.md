@@ -86,16 +86,3 @@ python manage.py iconx_generate [options]
 | `--subset name1,name2` | Only generate CSS for the listed icon names |
 | `--dry-run` | Print CSS to stdout instead of writing to file |
 | `--skip-name-collisions` | Warn on name collisions instead of aborting |
-
-## Template tag
-
-```html
-{% load iconx %}
-
-{% icon "search" %}
-{% icon "search" class="text-lg text-blue-500" %}
-{% icon "warning" aria_label="Warning" %}
-{% icon "search" data_controller="icon" %}
-```
-
-The `{% icon %}` tag renders an `<i>` element with the correct CSS classes. When `aria_label` is provided, it adds `role="img"` and `aria-label`; otherwise it adds `aria-hidden="true"`. Extra keyword arguments are rendered as HTML attributes (underscores become hyphens).
