@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://oliverhaas.github.io/django-iconx/0.1.0a3/</loc>
+         <lastmod>2026-04-07</lastmod>
+    </url>
+    <url>
+         <loc>https://oliverhaas.github.io/django-iconx/0.1.0a3/getting-started/icon-packages/</loc>
+         <lastmod>2026-04-07</lastmod>
+    </url>
+    <url>
+         <loc>https://oliverhaas.github.io/django-iconx/0.1.0a3/getting-started/installation/</loc>
+         <lastmod>2026-04-07</lastmod>
+    </url>
+    <url>
+         <loc>https://oliverhaas.github.io/django-iconx/0.1.0a3/reference/changelog/</loc>
+         <lastmod>2026-04-07</lastmod>
+    </url>
+    <url>
+         <loc>https://oliverhaas.github.io/django-iconx/0.1.0a3/reference/configuration/</loc>
+         <lastmod>2026-04-07</lastmod>
+    </url>
+</urlset>
