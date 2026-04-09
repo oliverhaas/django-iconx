@@ -187,3 +187,23 @@ class TestDiscover:
             discovered = discover(settings, skip_collisions=True)
         assert "collision" in caplog.text.lower()
         assert "search" in discovered.icons
+
+    def test_default_uses_filename_only(self):
+        settings = IconxSettings(sets=[IconSet("nested/")])
+        discovered = discover(settings)
+        assert "arrow" in discovered.icons
+        assert "top" in discovered.icons
+        assert "sub-arrow" not in discovered.icons
+
+    def test_include_path_preserves_directories(self):
+        settings = IconxSettings(sets=[IconSet("nested/", include_path=True)])
+        discovered = discover(settings)
+        assert "sub-arrow" in discovered.icons
+        assert "top" in discovered.icons
+        assert "arrow" not in discovered.icons
+
+    def test_include_path_with_prefix(self):
+        settings = IconxSettings(sets=[IconSet("nested/", prefix="n", include_path=True)])
+        discovered = discover(settings)
+        assert "n-sub-arrow" in discovered.icons
+        assert "n-top" in discovered.icons

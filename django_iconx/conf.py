@@ -15,6 +15,7 @@ class IconSet:
     path: str
     prefix: str = ""
     color: str = "mono"
+    include_path: bool = False
 
     def __post_init__(self) -> None:
         if self.color not in VALID_COLORS:
@@ -36,7 +37,7 @@ class IconxSettings:
             raise ValueError(msg)
 
 
-def _normalize_sets(raw_sets: list[str | dict[str, str]]) -> list[IconSet]:
+def _normalize_sets(raw_sets: list[str | dict[str, Any]]) -> list[IconSet]:
     """Normalize set config: strings become IconSet(path=...), dicts become IconSet(**...)."""
     return [IconSet(path=s) if isinstance(s, str) else IconSet(**s) for s in raw_sets]
 

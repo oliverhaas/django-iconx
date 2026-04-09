@@ -11,6 +11,7 @@ class TestIconSet:
         s = IconSet(path="icons/")
         assert s.prefix == ""
         assert s.color == "mono"
+        assert s.include_path is False
 
     def test_original_color(self):
         s = IconSet(path="logos/", color="original")

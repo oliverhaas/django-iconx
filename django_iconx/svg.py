@@ -50,7 +50,7 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
 
         size, rest = _extract_size_prefix(remainder)
         if size is not None:
-            icon_name = _remainder_to_icon_name(rest, icon_set.prefix)
+            icon_name = _remainder_to_icon_name(rest, icon_set.prefix, include_path=icon_set.include_path)
             if icon_name not in sized:
                 sized[icon_name] = {}
                 sized_rel[icon_name] = {}
@@ -63,7 +63,7 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
             sized[icon_name][size] = svg_path
             sized_rel[icon_name][size] = relative
         else:
-            icon_name = _remainder_to_icon_name(remainder, icon_set.prefix)
+            icon_name = _remainder_to_icon_name(remainder, icon_set.prefix, include_path=icon_set.include_path)
             if icon_name in plain:
                 msg = f"Icon name collision: '{icon_name}' produced by both '{plain[icon_name]}' and '{svg_path}'"
                 if not skip_collisions:
@@ -159,14 +159,18 @@ def _extract_size_prefix(remainder: str) -> tuple[int | None, str]:
     return None, remainder
 
 
-def _remainder_to_icon_name(remainder: str, prefix: str) -> str:
+def _remainder_to_icon_name(remainder: str, prefix: str, *, include_path: bool = False) -> str:
     """Convert the remainder of a matched path to an icon class name.
 
-    'search.svg' -> 'search'
-    'sub/arrow-left.svg' -> 'sub-arrow-left'
+    Default (include_path=False): 'sub/arrow-left.svg' -> 'arrow-left'
+    With include_path=True:       'sub/arrow-left.svg' -> 'sub-arrow-left'
     """
-    name = re.sub(r"\.svg$", "", remainder)
-    name = name.replace("/", "-").replace("\\", "-")
+    if include_path:
+        name = re.sub(r"\.svg$", "", remainder)
+        name = name.replace("/", "-").replace("\\", "-")
+    else:
+        filename = remainder.rsplit("/", 1)[-1]
+        name = re.sub(r"\.svg$", "", filename)
 
     if prefix:
         name = f"{prefix}-{name}"

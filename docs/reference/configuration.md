@@ -39,6 +39,7 @@ Paths are matched as regex patterns against file paths relative to `STATICFILES_
 | `path` | (required) | Regex pattern to match against relative file paths |
 | `prefix` | `""` | Prefix added to icon class names (e.g. `prefix="hero"` produces `.icon-hero-search`) |
 | `color` | `"mono"` | `"mono"` for single-color icons (uses CSS mask), `"original"` for multi-color (uses background-image) |
+| `include_path` | `false` | Include directory structure in class names. `false`: `icons/lucide/search.svg` produces `.icon-search`. `true`: produces `.icon-lucide-search`. |
 
 ### `output`
 
