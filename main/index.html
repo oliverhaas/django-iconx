@@ -629,9 +629,9 @@
 
 <h1 id="django-iconx">django-iconx<a class="headerlink" href="#django-iconx" title="Permanent link">&para;</a></h1>
 <p>CSS-only icon system for Django.</p>
-<p>Generates a single CSS file from SVG icon sources (e.g. Lucide, Heroicons, or your own SVGs). Icons are rendered purely via CSS. No JavaScript or icon fonts needed.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;icon icon-search&quot;</span> <span class="na">aria-hidden</span><span class="o">=</span><span class="s">&quot;true&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;icon icon-check text-2xl text-green-500&quot;</span> <span class="na">aria-hidden</span><span class="o">=</span><span class="s">&quot;true&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
+<p>Generates a single CSS file from SVG icon sources. No JavaScript or icon fonts needed. Built-in support for Lucide, Heroicons, Tabler, Phosphor, Bootstrap Icons, and Remix.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;icon icon-lucide-search&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="p">&lt;</span><span class="nt">i</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;icon icon-lucide-check text-2xl text-green-500&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">i</span><span class="p">&gt;</span>
 </code></pre></div>
 <p>Mono icons use <code>mask-image</code> with <code>currentColor</code>, so they inherit text color and scale with font size via Tailwind <code>text-*</code> classes. Multi-color icons use <code>background-image</code> to preserve original SVG colors.</p>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
@@ -643,12 +643,12 @@
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">]</span>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span><span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">&quot;static&quot;</span><span class="p">]</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">ICONX</span> <span class="o">=</span> <span class="p">{</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;icons/&quot;</span><span class="p">],</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">python manage.py iconx_generate</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">python manage.py iconx add lucide</span>
+</code></pre></div>
+<p>That downloads the icons and generates the CSS. Include it in your template or Tailwind entry point:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">@</span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;tailwindcss&quot;</span><span class="p">;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="p">@</span><span class="k">import</span><span class="w"> </span><span class="s2">&quot;./static/iconx/icons.css&quot;</span><span class="p">;</span>
 </code></pre></div>
 <p>See <a href="getting-started/installation/">Installation</a> for the full setup guide.</p>
 

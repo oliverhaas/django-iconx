@@ -609,13 +609,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#management-command" class="md-nav__link">
+  <a href="#management-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Management command
+        Management commands
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Management commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iconx-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iconx add
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iconx-generate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iconx generate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -779,13 +807,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#management-command" class="md-nav__link">
+  <a href="#management-commands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Management command
+        Management commands
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Management commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iconx-add" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iconx add
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iconx-generate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iconx generate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -891,8 +947,35 @@
 <p>Default icon dimensions (width and height).</p>
 <p><strong>Default:</strong> <code>"1em"</code></p>
 <p>Since icons use <code>1em</code> sizing by default, they scale with font size. Use Tailwind <code>text-*</code> classes to control size.</p>
-<h2 id="management-command">Management command<a class="headerlink" href="#management-command" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">python manage.py iconx_generate [options]</span>
+<h2 id="management-commands">Management commands<a class="headerlink" href="#management-commands" title="Permanent link">&para;</a></h2>
+<h3 id="iconx-add"><code>iconx add</code><a class="headerlink" href="#iconx-add" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="go">python manage.py iconx add &lt;package&gt; [options]</span>
+</code></pre></div>
+<p>Downloads an icon package from GitHub and generates CSS.</p>
+<table>
+<thead>
+<tr>
+<th>Argument / Flag</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>package</code></td>
+<td>Package name, e.g. <code>lucide</code>, <code>heroicons/24</code>, <code>tabler/outline</code></td>
+</tr>
+<tr>
+<td><code>--version TAG</code></td>
+<td>Specific version tag (default: latest release)</td>
+</tr>
+<tr>
+<td><code>--no-generate</code></td>
+<td>Skip CSS generation after download</td>
+</tr>
+</tbody>
+</table>
+<h3 id="iconx-generate"><code>iconx generate</code><a class="headerlink" href="#iconx-generate" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="go">python manage.py iconx generate [options]</span>
 </code></pre></div>
 <table>
 <thead>
