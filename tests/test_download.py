@@ -14,6 +14,7 @@ from django_iconx.download import (
     _extract_svgs,
     _find_archive_root,
     _get_latest_version,
+    _resolve_package,
     download_package,
     parse_package_spec,
 )
@@ -32,11 +33,8 @@ class TestParsePackageSpec:
 
 class TestResolvePackage:
     def test_known_package(self):
-        result = download_package.__wrapped__ if hasattr(download_package, "__wrapped__") else None
-        # Test via download_package which calls _resolve_package internally
-        with pytest.raises(CommandError, match="STATICFILES_DIRS"):
-            # Will fail at STATICFILES_DIRS check, but _resolve_package succeeds
-            pass
+        pkg = _resolve_package("lucide")
+        assert pkg.repo == "lucide-icons/lucide"
 
     def test_unknown_package(self, tmp_path):
         with pytest.raises(CommandError, match="Unknown package 'foobar'"):
@@ -145,6 +143,18 @@ class TestExtractSvgs:
         assert count == 2
         assert (tmp_path / "out" / "outline" / "search.svg").exists()
         assert (tmp_path / "out" / "filled" / "search.svg").exists()
+
+    def test_path_traversal_skipped(self, tmp_path):
+        zip_buf = self._make_zip(
+            {
+                "root/icons/good.svg": "<svg>good</svg>",
+                "root/icons/../../evil.svg": "<svg>evil</svg>",
+            },
+        )
+        count = _extract_svgs(zip_buf, "icons/", None, tmp_path / "out")
+        assert count == 1
+        assert (tmp_path / "out" / "good.svg").exists()
+        assert not (tmp_path / "evil.svg").exists()
 
     def test_overwrites_existing_directory(self, tmp_path):
         target = tmp_path / "out"

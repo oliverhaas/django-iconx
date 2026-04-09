@@ -2,7 +2,7 @@
 
 CSS-only icon system for Django.
 
-Generates a single CSS file from SVG icon sources. No JavaScript or icon fonts needed. Built-in support for Lucide, Heroicons, Tabler, Phosphor, and Bootstrap Icons.
+Generates a single CSS file from SVG icon sources. No JavaScript or icon fonts needed. Built-in support for Lucide, Heroicons, Tabler, Phosphor, Bootstrap Icons, and Remix.
 
 ```html
 <i class="icon icon-lucide-search"></i>

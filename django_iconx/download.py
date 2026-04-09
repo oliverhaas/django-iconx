@@ -131,6 +131,8 @@ def _extract_svgs(
             if not relative:
                 continue
             dest = target_dir / relative
+            if not dest.resolve().is_relative_to(target_dir.resolve()):
+                continue
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(zf.read(entry))
             count += 1

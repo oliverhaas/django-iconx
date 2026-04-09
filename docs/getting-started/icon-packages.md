@@ -11,6 +11,7 @@ django-iconx can download icon packages directly from GitHub. No npm required.
 | [Tabler](https://tabler.io/icons) | `iconx add tabler` | ~6,000 |
 | [Phosphor](https://phosphoricons.com) | `iconx add phosphor` | ~7,000 |
 | [Bootstrap](https://icons.getbootstrap.com) | `iconx add bootstrap` | ~2,000 |
+| [Remix](https://remixicon.com) | `iconx add remix` | ~2,800 |
 
 ```console
 python manage.py iconx add lucide
