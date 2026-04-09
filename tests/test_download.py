@@ -4,7 +4,7 @@ import io
 import json
 import zipfile
 from unittest.mock import patch
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 
 import pytest
 from django.core.management.base import CommandError
@@ -74,6 +74,31 @@ class TestGetLatestVersion:
             pytest.raises(CommandError, match="Failed to fetch"),
         ):
             _get_latest_version("lucide-icons/lucide")
+
+    def test_rate_limit_403(self):
+        error = HTTPError("url", 403, "Forbidden", {}, None)
+        with (
+            patch("django_iconx.download.urlopen", side_effect=error),
+            pytest.raises(CommandError, match="rate limit") as exc_info,
+        ):
+            _get_latest_version("lucide-icons/lucide")
+        assert "--version" in str(exc_info.value)
+        assert "GITHUB_TOKEN" in str(exc_info.value)
+
+    def test_github_token_sent(self):
+        response_data = json.dumps({"tag_name": "v1.0.0"}).encode()
+        mock_resp = io.BytesIO(response_data)
+
+        with (
+            patch.dict("os.environ", {"GITHUB_TOKEN": "ghp_test123"}),
+            patch("django_iconx.download.urlopen") as mock_urlopen,
+        ):
+            mock_urlopen.return_value.__enter__ = lambda s: mock_resp
+            mock_urlopen.return_value.__exit__ = lambda s, *a: None
+            _get_latest_version("lucide-icons/lucide")
+
+        req = mock_urlopen.call_args[0][0]
+        assert req.get_header("Authorization") == "Bearer ghp_test123"
 
 
 class TestFindArchiveRoot:

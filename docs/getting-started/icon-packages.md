@@ -48,6 +48,19 @@ By default, the latest release is downloaded. Pin a version with `--version`:
 python manage.py iconx add lucide --version v1.7.0
 ```
 
+## GitHub rate limits
+
+The `add` command uses the GitHub API to find the latest release. Unauthenticated requests are limited to 60/hour, which can cause 403 errors.
+
+Two ways to avoid this:
+
+- **Pin a version** with `--version` to skip the API call entirely
+- **Set `GITHUB_TOKEN`** to raise the limit to 5,000/hour:
+  ```console
+  export GITHUB_TOKEN=ghp_...
+  python manage.py iconx add lucide
+  ```
+
 ## Custom SVGs
 
 For your own SVGs, place them in a directory under `STATICFILES_DIRS` and configure the set in your Django settings:

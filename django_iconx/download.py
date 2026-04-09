@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import logging
+import os
 import shutil
 import zipfile
 from dataclasses import dataclass
@@ -75,13 +76,31 @@ def _resolve_package(name: str) -> IconPackage:
     return REGISTRY[name]
 
 
+def _github_headers() -> dict[str, str]:
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+
+
 def _get_latest_version(repo: str) -> str:
     url = f"{GITHUB_API}/{repo}/releases/latest"
-    req = Request(url, headers={"Accept": "application/vnd.github.v3+json"})  # noqa: S310
+    req = Request(url, headers=_github_headers())  # noqa: S310
     try:
         with urlopen(req, timeout=TIMEOUT) as resp:  # noqa: S310
             data = json.loads(resp.read())
-    except (URLError, HTTPError) as e:
+    except HTTPError as e:
+        if e.code == 403:  # noqa: PLR2004
+            msg = (
+                f"GitHub API rate limit hit for {repo}. "
+                "Pass --version <tag> to skip the API call, "
+                "or set GITHUB_TOKEN to raise the limit."
+            )
+            raise CommandError(msg) from e
+        msg = f"Failed to fetch latest version for {repo}: {e}"
+        raise CommandError(msg) from e
+    except URLError as e:
         msg = f"Failed to fetch latest version for {repo}: {e}"
         raise CommandError(msg) from e
     return data["tag_name"]
