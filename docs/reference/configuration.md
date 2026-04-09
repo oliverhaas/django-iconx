@@ -73,10 +73,26 @@ Default icon dimensions (width and height).
 
 Since icons use `1em` sizing by default, they scale with font size. Use Tailwind `text-*` classes to control size.
 
-## Management command
+## Management commands
+
+### `iconx add`
 
 ```console
-python manage.py iconx_generate [options]
+python manage.py iconx add <package> [options]
+```
+
+Downloads an icon package from GitHub and generates CSS.
+
+| Argument / Flag | Description |
+|------|-------------|
+| `package` | Package name, e.g. `lucide`, `heroicons/24`, `tabler/outline` |
+| `--version TAG` | Specific version tag (default: latest release) |
+| `--no-generate` | Skip CSS generation after download |
+
+### `iconx generate`
+
+```console
+python manage.py iconx generate [options]
 ```
 
 | Flag | Description |

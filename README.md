@@ -8,14 +8,18 @@ CSS-only icon system for Django.
 
 ![django-iconx demo](docs/assets/demo.png)
 
-Generates a single CSS file from SVG icon sources (Lucide, Heroicons, or your own). No JavaScript, no icon fonts.
+Generates a single CSS file from SVG icon sources. No JavaScript, no icon fonts.
+
+```console
+python manage.py iconx add lucide
+```
 
 ```html
-<i class="icon icon-search"></i>
-<span class="icon icon-check text-2xl text-green-500"></span>
-<!-- aria-hidden="true" hides decorative icons from screen readers -->
-<i class="icon icon-search" aria-hidden="true"></i>
+<i class="icon icon-lucide-search"></i>
+<span class="icon icon-lucide-check text-2xl text-green-500"></span>
 ```
+
+Built-in support for Lucide, Heroicons, Tabler, Phosphor, Bootstrap Icons, and Remix. Or bring your own SVGs.
 
 ## How it works and what the upsides are
 
@@ -46,13 +50,22 @@ CSS `mask-image` is supported unprefixed in all modern browsers since Dec 2023 (
 @import "./static/iconx/icons.css";
 ```
 
-## Installation
+## Quick start
 
 ```console
 uv add django-iconx
 ```
 
-Full documentation at [oliverhaas.github.io/django-iconx](https://oliverhaas.github.io/django-iconx/)
+```python
+INSTALLED_APPS = ["django_iconx", ...]
+STATICFILES_DIRS = [BASE_DIR / "static"]
+```
+
+```console
+python manage.py iconx add lucide
+```
+
+That downloads Lucide icons and generates the CSS. Include the CSS in your template or Tailwind entry point and use icons via class names. See the full documentation at [oliverhaas.github.io/django-iconx](https://oliverhaas.github.io/django-iconx/) for custom SVGs, multiple icon sets, and configuration options.
 
 ## License
 
