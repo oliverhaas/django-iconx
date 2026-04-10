@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -35,6 +36,18 @@ class Command(BaseCommand):
             help="Skip CSS generation after download",
         )
 
+        # --- remove ---
+        remove_parser = subparsers.add_parser("remove", help="Remove a downloaded icon package")
+        remove_parser.add_argument(
+            "package",
+            help="Package name to remove, e.g. 'lucide', 'heroicons'",
+        )
+        remove_parser.add_argument(
+            "--no-generate",
+            action="store_true",
+            help="Skip CSS regeneration after removal",
+        )
+
         # --- generate ---
         gen_parser = subparsers.add_parser("generate", help="Generate CSS file from SVG icons")
         gen_parser.add_argument(
@@ -67,6 +80,8 @@ class Command(BaseCommand):
         subcommand = options.get("subcommand")
         if subcommand == "add":
             self._handle_add(**options)
+        elif subcommand == "remove":
+            self._handle_remove(**options)
         elif subcommand == "generate":
             self._handle_generate(**options)
         else:
@@ -92,6 +107,29 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Downloaded {result.icon_count} icons from {result.package} {result.version}"),
         )
         self.stdout.write(f"  {result.target_dir}")
+
+        if not options.get("no_generate"):
+            self._handle_generate(**options)
+
+    def _handle_remove(self, **options: Any) -> None:  # noqa: ANN401
+        static_dirs = getattr(settings, "STATICFILES_DIRS", [])
+        if not static_dirs:
+            msg = "STATICFILES_DIRS is not configured. Add at least one directory to your Django settings."
+            raise CommandError(msg)
+
+        first_dir = static_dirs[0]
+        if isinstance(first_dir, (list, tuple)):
+            first_dir = first_dir[1]
+
+        name = options["package"].split("/", 1)[0]
+        target_dir = Path(first_dir) / "icons" / name
+
+        if not target_dir.is_dir():
+            msg = f"Icon package '{name}' not found at {target_dir}"
+            raise CommandError(msg)
+
+        shutil.rmtree(target_dir)
+        self.stdout.write(self.style.SUCCESS(f"Removed {target_dir}"))
 
         if not options.get("no_generate"):
             self._handle_generate(**options)

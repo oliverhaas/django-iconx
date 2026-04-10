@@ -90,6 +90,19 @@ Downloads an icon package from GitHub and generates CSS.
 | `--version TAG` | Specific version tag (default: latest release) |
 | `--no-generate` | Skip CSS generation after download |
 
+### `iconx remove`
+
+```console
+python manage.py iconx remove <package> [options]
+```
+
+Removes a downloaded icon package and regenerates CSS.
+
+| Argument / Flag | Description |
+|------|-------------|
+| `package` | Package name to remove, e.g. `lucide`, `heroicons` |
+| `--no-generate` | Skip CSS regeneration after removal |
+
 ### `iconx generate`
 
 ```console
