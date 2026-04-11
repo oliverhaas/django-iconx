@@ -19,3 +19,4 @@ site/
 node_modules/
 .playwright-mcp/
 examples/*/static/
+docs/superpowers/
