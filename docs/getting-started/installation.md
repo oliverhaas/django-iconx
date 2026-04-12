@@ -24,7 +24,7 @@ python manage.py iconx add lucide
 This downloads Lucide icons to `static/icons/lucide/` and generates `static/iconx/icons.css`. Include the CSS in your templates or Tailwind entry point:
 
 ```html
-<i class="icon icon-lucide-search"></i>
+<i class="icon icon-search"></i>
 ```
 
 See [Icon Packages](icon-packages.md) for other icon sets and custom SVGs. See [Configuration](../reference/configuration.md) for all available settings.

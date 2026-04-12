@@ -17,7 +17,7 @@ django-iconx can download icon packages directly from GitHub. No npm required.
 python manage.py iconx add lucide
 ```
 
-This downloads the SVGs to `static/icons/lucide/` and generates the CSS. Icons are available as `icon-lucide-search`, `icon-lucide-arrow-left`, etc.
+This downloads the SVGs to `static/icons/lucide/` and generates the CSS. Icons are available as `icon-search`, `icon-arrow-left`, etc.
 
 ## Styles
 
@@ -33,12 +33,25 @@ Without a style, all variants are downloaded.
 
 ## Multiple packages
 
-Add as many packages as you need. Each gets its own subdirectory under `static/icons/`, so names stay namespaced:
+Add as many packages as you need. Each gets its own subdirectory under `static/icons/`:
 
 ```console
 python manage.py iconx add lucide
 python manage.py iconx add heroicons/24
 ```
+
+By default, class names use filenames only (e.g. `icon-search`). If two packages contain icons with the same filename, `iconx generate` will report a collision. Use `include_path` or `prefix` to disambiguate:
+
+```python
+ICONX = {
+    "sets": [
+        {"path": "icons/lucide/", "prefix": "lucide"},
+        {"path": "icons/heroicons/", "prefix": "hero"},
+    ],
+}
+```
+
+This produces `.icon-lucide-search` and `.icon-hero-search`. See [Configuration](../reference/configuration.md) for all options.
 
 ## Pinning versions
 

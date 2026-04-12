@@ -20,6 +20,15 @@ from django_iconx.download import (
 )
 
 
+def _make_zip(files: dict[str, str]) -> io.BytesIO:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        for path, content in files.items():
+            zf.writestr(path, content)
+    buf.seek(0)
+    return buf
+
+
 class TestParsePackageSpec:
     def test_simple_name(self):
         assert parse_package_spec("lucide") == ("lucide", None)
@@ -121,16 +130,8 @@ class TestFindArchiveRoot:
 
 
 class TestExtractSvgs:
-    def _make_zip(self, files: dict[str, str]) -> io.BytesIO:
-        buf = io.BytesIO()
-        with zipfile.ZipFile(buf, "w") as zf:
-            for path, content in files.items():
-                zf.writestr(path, content)
-        buf.seek(0)
-        return buf
-
     def test_extracts_only_svgs(self, tmp_path):
-        zip_buf = self._make_zip(
+        zip_buf = _make_zip(
             {
                 "root/icons/search.svg": "<svg>search</svg>",
                 "root/icons/arrow.svg": "<svg>arrow</svg>",
@@ -145,7 +146,7 @@ class TestExtractSvgs:
         assert not (tmp_path / "out" / "README.md").exists()
 
     def test_extracts_with_style_filter(self, tmp_path):
-        zip_buf = self._make_zip(
+        zip_buf = _make_zip(
             {
                 "root/optimized/16/search.svg": "<svg>16</svg>",
                 "root/optimized/24/search.svg": "<svg>24</svg>",
@@ -158,7 +159,7 @@ class TestExtractSvgs:
         assert (tmp_path / "out" / "arrow.svg").exists()
 
     def test_preserves_subdirectory_structure(self, tmp_path):
-        zip_buf = self._make_zip(
+        zip_buf = _make_zip(
             {
                 "root/icons/outline/search.svg": "<svg/>",
                 "root/icons/filled/search.svg": "<svg/>",
@@ -170,7 +171,7 @@ class TestExtractSvgs:
         assert (tmp_path / "out" / "filled" / "search.svg").exists()
 
     def test_path_traversal_skipped(self, tmp_path):
-        zip_buf = self._make_zip(
+        zip_buf = _make_zip(
             {
                 "root/icons/good.svg": "<svg>good</svg>",
                 "root/icons/../../evil.svg": "<svg>evil</svg>",
@@ -186,7 +187,7 @@ class TestExtractSvgs:
         target.mkdir()
         (target / "old.svg").write_text("<svg>old</svg>")
 
-        zip_buf = self._make_zip({"root/icons/new.svg": "<svg>new</svg>"})
+        zip_buf = _make_zip({"root/icons/new.svg": "<svg>new</svg>"})
         _extract_svgs(zip_buf, "icons/", None, target)
 
         assert (target / "new.svg").exists()
@@ -194,17 +195,9 @@ class TestExtractSvgs:
 
 
 class TestDownloadPackage:
-    def _make_zip(self, files: dict[str, str]) -> io.BytesIO:
-        buf = io.BytesIO()
-        with zipfile.ZipFile(buf, "w") as zf:
-            for path, content in files.items():
-                zf.writestr(path, content)
-        buf.seek(0)
-        return buf
-
     def test_full_flow(self, tmp_path):
         api_response = io.BytesIO(json.dumps({"tag_name": "v1.0.0"}).encode())
-        zip_buf = self._make_zip(
+        zip_buf = _make_zip(
             {
                 "lucide-1.0.0/icons/search.svg": "<svg/>",
                 "lucide-1.0.0/icons/arrow.svg": "<svg/>",

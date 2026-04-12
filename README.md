@@ -15,8 +15,8 @@ python manage.py iconx add lucide
 ```
 
 ```html
-<i class="icon icon-lucide-search"></i>
-<span class="icon icon-lucide-check text-2xl text-green-500"></span>
+<i class="icon icon-search"></i>
+<span class="icon icon-check text-2xl text-green-500"></span>
 ```
 
 Built-in support for Lucide, Heroicons, Tabler, Phosphor, Bootstrap Icons, and Remix. Or bring your own SVGs.

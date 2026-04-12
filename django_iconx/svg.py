@@ -55,7 +55,7 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
                 sized[icon_name] = {}
                 sized_rel[icon_name] = {}
             if size in sized[icon_name]:
-                msg = f"Icon name collision: '{icon_name}' size {size} produced by both '{sized[icon_name][size]}' and '{svg_path}'"
+                msg = f"Icon name collision: '{icon_name}' size {size} produced by both '{sized[icon_name][size]}' and '{svg_path}'. Use include_path or prefix in your ICONX sets config to disambiguate."
                 if not skip_collisions:
                     raise ValueError(msg)
                 logger.warning(msg)
@@ -65,7 +65,7 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
         else:
             icon_name = _remainder_to_icon_name(remainder, icon_set.prefix, include_path=icon_set.include_path)
             if icon_name in plain:
-                msg = f"Icon name collision: '{icon_name}' produced by both '{plain[icon_name]}' and '{svg_path}'"
+                msg = f"Icon name collision: '{icon_name}' produced by both '{plain[icon_name]}' and '{svg_path}'. Use include_path or prefix in your ICONX sets config to disambiguate."
                 if not skip_collisions:
                     raise ValueError(msg)
                 logger.warning(msg)
@@ -78,7 +78,7 @@ def discover(icon_settings: IconxSettings, *, skip_collisions: bool = False) -> 
     # Check for collisions between plain and sized icons
     for icon_name in sized:
         if icon_name in plain:
-            msg = f"Icon name collision: '{icon_name}' exists as both a plain icon and a sized variant"
+            msg = f"Icon name collision: '{icon_name}' exists as both a plain icon and a sized variant. Use include_path or prefix in your ICONX sets config to disambiguate."
             if not skip_collisions:
                 raise ValueError(msg)
             logger.warning(msg)
@@ -141,7 +141,11 @@ def _match_set(relative_path: str, sets: list[IconSet]) -> tuple[IconSet, str] |
     Returns (matched_set, remainder_after_match) or None.
     """
     for icon_set in sets:
-        m = re.match(icon_set.path, relative_path)
+        try:
+            m = re.match(icon_set.path, relative_path)
+        except re.error as e:
+            msg = f"Invalid regex in icon set path {icon_set.path!r}: {e}"
+            raise ValueError(msg) from e
         if m:
             remainder = relative_path[m.end() :]
             return icon_set, remainder

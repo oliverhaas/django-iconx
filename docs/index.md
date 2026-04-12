@@ -5,8 +5,8 @@ CSS-only icon system for Django.
 Generates a single CSS file from SVG icon sources. No JavaScript or icon fonts needed. Built-in support for Lucide, Heroicons, Tabler, Phosphor, Bootstrap Icons, and Remix.
 
 ```html
-<i class="icon icon-lucide-search"></i>
-<i class="icon icon-lucide-check text-2xl text-green-500"></i>
+<i class="icon icon-search"></i>
+<i class="icon icon-check text-2xl text-green-500"></i>
 ```
 
 Mono icons use `mask-image` with `currentColor`, so they inherit text color and scale with font size via Tailwind `text-*` classes. Multi-color icons use `background-image` to preserve original SVG colors.

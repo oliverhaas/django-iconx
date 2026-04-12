@@ -152,8 +152,7 @@ class Command(BaseCommand):
         try:
             discovered = discover(icon_settings, skip_collisions=options.get("skip_name_collisions", False))
         except ValueError as e:
-            self.stderr.write(self.style.ERROR(str(e)))
-            return
+            raise CommandError(str(e)) from e
         if not discovered.icons:
             self.stderr.write(self.style.WARNING("No SVG icons found in configured sets."))
             return

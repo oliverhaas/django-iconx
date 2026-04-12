@@ -1,6 +1,6 @@
 [project]
 name = "django-iconx"
-version = "0.1.0"
+version = "0.2.0"
 description = "CSS-only icon system for Django"
 readme = "README.md"
 license = { text = "MIT" }
@@ -8,7 +8,7 @@ requires-python = ">=3.12"
 keywords = ["django", "icons", "css"]
 authors = [{ name = "Oliver Haas", email = "ohaas@e1plus.de" }]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   "Framework :: Django",
   "Framework :: Django :: 5.2",
   "Framework :: Django :: 6.0",
@@ -37,7 +37,7 @@ dev = [
   "pytest==9.0.3",
   "pytest-cov==7.1.0",
   "pytest-xdist==3.8.0",
-  "ruff==0.15.9",
+  "ruff==0.15.10",
   "mypy==1.20.0",
   "django-stubs==6.0.2",
   "pytest-django==4.12.0",
