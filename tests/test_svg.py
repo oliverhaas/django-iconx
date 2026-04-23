@@ -164,7 +164,7 @@ class TestDiscover:
     def test_icon_sets_populated(self):
         settings = IconxSettings(sets=[IconSet("icons/")])
         discovered = discover(settings)
-        assert discovered.icon_sets["search"].color == "mono"
+        assert discovered.icon_sets["search"].color is False
 
     def test_sized_collision_raises(self):
         settings = IconxSettings(

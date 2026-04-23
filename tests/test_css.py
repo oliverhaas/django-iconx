@@ -23,6 +23,7 @@ class TestGenerateCss:
     def test_mono_base_rule(self):
         css = generate_css(self._settings())
         assert "background-color: currentColor;" in css
+        assert "mask-image: var(--icon-url);" in css
         assert "mask-mode: alpha;" in css
         assert "mask-size: contain;" in css
 
@@ -34,7 +35,7 @@ class TestGenerateCss:
         css = generate_css(self._settings())
         assert ".icon-search {" in css
         assert ".icon-x {" in css
-        assert "mask-image: url(" in css
+        assert "--icon-url: url(" in css
 
     def test_data_uri_mode(self):
         css = generate_css(self._settings(mode="data_uri"))
@@ -43,7 +44,7 @@ class TestGenerateCss:
     def test_url_mode(self):
         css = generate_css(self._settings(mode="url"))
         assert "data:image/svg+xml," not in css
-        assert 'mask-image: url("/static/icons/search.svg")' in css
+        assert '--icon-url: url("/static/icons/search.svg")' in css
 
     def test_custom_prefix(self):
         css = generate_css(self._settings(prefix="i"))
@@ -104,41 +105,50 @@ class TestSizeVariantCss:
         assert ".text-xs.icon-x" not in css
 
 
-class TestOriginalColorCss:
+class TestColorIconCss:
     def _settings(self, **kwargs):
-        defaults = {"sets": [IconSet("icons/", color="original")]}
+        defaults = {"sets": [IconSet("icons/", color=True)]}
         defaults.update(kwargs)
         return IconxSettings(**defaults)
 
-    def test_uses_background_image(self):
+    def test_color_base_rule(self):
         css = generate_css(self._settings())
-        assert "background-image: url(" in css
-        assert "background-size: contain;" in css
-
-    def test_no_mask_for_original(self):
-        css = generate_css(self._settings())
-        assert "mask-image" not in css
-        assert "mask-mode" not in css
-
-    def test_multi_base_rule(self):
-        css = generate_css(self._settings())
+        assert ".icon-color {" in css
+        assert "background-image: var(--icon-url);" in css
         assert "background-size: contain;" in css
         assert "background-repeat: no-repeat;" in css
         assert "background-position: center;" in css
 
+    def test_no_mono_base_when_only_colored(self):
+        css = generate_css(self._settings())
+        # mono base (".icon { ... }") must not be emitted if no mono icons exist
+        assert "mask-image" not in css
+        assert "mask-mode" not in css
+        assert "currentColor" not in css
+
+    def test_per_icon_rules_use_variable(self):
+        css = generate_css(self._settings())
+        # color icons emit the same --icon-url shape as mono icons
+        assert ".icon-search { --icon-url: url(" in css
+
     def test_mixed_sets(self):
         settings = IconxSettings(
             sets=[
-                IconSet("icons/", color="mono"),
-                IconSet("heroicons/", prefix="logo", color="original"),
+                IconSet("icons/"),
+                IconSet("heroicons/", prefix="logo", color=True),
             ],
         )
         css = generate_css(settings)
-        # mono icons use mask-image
-        assert ".icon-search { mask-image: url(" in css
-        # original icons use background-image
-        assert ".icon-logo-arrow-left { background-image: url(" in css
+        # both bases are emitted
+        assert ".icon {" in css
+        assert ".icon-color {" in css
+        # both icon families emit identical --icon-url rules
+        assert ".icon-search { --icon-url: url(" in css
+        assert ".icon-logo-arrow-left { --icon-url: url(" in css
+        # mono base wires the variable into mask-image, color base into background-image
+        assert "mask-image: var(--icon-url);" in css
+        assert "background-image: var(--icon-url);" in css
 
-    def test_url_mode_original(self):
+    def test_url_mode_colored(self):
         css = generate_css(self._settings(mode="url"))
-        assert 'background-image: url("/static/icons/search.svg")' in css
+        assert '--icon-url: url("/static/icons/search.svg")' in css

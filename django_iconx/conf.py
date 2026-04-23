@@ -6,7 +6,6 @@ from typing import Any
 from django.conf import settings
 
 VALID_MODES = ("data_uri", "url")
-VALID_COLORS = ("mono", "original")
 DEFAULT_PREFIX = "icon"
 
 
@@ -14,13 +13,8 @@ DEFAULT_PREFIX = "icon"
 class IconSet:
     path: str
     prefix: str = ""
-    color: str = "mono"
+    color: bool = False
     include_path: bool = False
-
-    def __post_init__(self) -> None:
-        if self.color not in VALID_COLORS:
-            msg = f"Invalid color {self.color!r}, must be one of {VALID_COLORS}"
-            raise ValueError(msg)
 
 
 @dataclass(frozen=True)

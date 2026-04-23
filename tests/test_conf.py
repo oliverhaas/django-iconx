@@ -10,20 +10,16 @@ class TestIconSet:
     def test_defaults(self):
         s = IconSet(path="icons/")
         assert s.prefix == ""
-        assert s.color == "mono"
+        assert s.color is False
         assert s.include_path is False
 
-    def test_original_color(self):
-        s = IconSet(path="logos/", color="original")
-        assert s.color == "original"
+    def test_colored(self):
+        s = IconSet(path="logos/", color=True)
+        assert s.color is True
 
     def test_custom_prefix(self):
         s = IconSet(path="heroicons/", prefix="hero")
         assert s.prefix == "hero"
-
-    def test_invalid_color(self):
-        with pytest.raises(ValueError, match="Invalid color"):
-            IconSet(path="icons/", color="rainbow")
 
 
 class TestIconxSettings:
@@ -65,11 +61,11 @@ class TestIconxSettings:
         ICONX={
             "sets": [
                 "icons/",
-                {"path": "logos/", "prefix": "logo", "color": "original"},
+                {"path": "logos/", "prefix": "logo", "color": True},
             ],
         },
     )
     def test_get_settings_normalizes_sets(self):
         s = get_settings()
         assert s.sets[0] == IconSet("icons/")
-        assert s.sets[1] == IconSet("logos/", prefix="logo", color="original")
+        assert s.sets[1] == IconSet("logos/", prefix="logo", color=True)

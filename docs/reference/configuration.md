@@ -25,7 +25,7 @@ ICONX = {
     "sets": [
         "icons/",                                          # string shorthand
         {"path": "heroicons/", "prefix": "hero"},          # with prefix
-        {"path": "logos/", "color": "original"},            # multi-color
+        {"path": "logos/", "color": True},                 # keep original colors
     ],
 }
 ```
@@ -38,7 +38,7 @@ Paths are matched as regex patterns against file paths relative to `STATICFILES_
 |--------|---------|-------------|
 | `path` | (required) | Regex pattern to match against relative file paths |
 | `prefix` | `""` | Prefix added to icon class names (e.g. `prefix="hero"` produces `.icon-hero-search`) |
-| `color` | `"mono"` | `"mono"` for single-color icons (uses CSS mask), `"original"` for multi-color (uses background-image) |
+| `color` | `False` | `False` for monochrome icons (rendered via CSS mask with `currentColor`, use with the `.icon` base class). `True` preserves the SVG's original colors (rendered as a background image, use with the `.icon-color` base class). |
 | `include_path` | `false` | Include directory structure in class names. `false`: `icons/lucide/search.svg` produces `.icon-search`. `true`: produces `.icon-lucide-search`. |
 
 ### `output`
@@ -64,7 +64,7 @@ CSS class prefix for all icons.
 
 **Default:** `"icon"`
 
-With the default prefix, icons get classes like `.icon` (base) and `.icon-search` (per-icon).
+With the default prefix, icons get classes like `.icon` / `.icon-color` (base classes) and `.icon-search` (per-icon).
 
 ### `size`
 

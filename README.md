@@ -17,23 +17,23 @@ python manage.py iconx add lucide
 ```html
 <i class="icon icon-search"></i>
 <span class="icon icon-check text-2xl text-green-500"></span>
+<i class="icon-color icon-logo"></i>
 ```
 
 Built-in support for Lucide, Heroicons, Tabler, Phosphor, Bootstrap Icons, and Remix. Or bring your own SVGs.
 
 ## How it works and what the upsides are
 
-Mono icons use `mask-image` with `background-color: currentColor`, so the SVG acts as a mask and the icon inherits text color. Multi-color icons use `background-image` to preserve original SVG colors.
+Each icon sets a `--icon-url` CSS variable. The `.icon` base class renders it via `mask-image` with `background-color: currentColor`, so the SVG acts as a mask and inherits text color. The `.icon-color` base class renders the same variable via `background-image`, preserving the SVG's original colors — use it for logos and other multi-color artwork.
 
 The output is plain CSS classes: no runtime, no bundler plugin, no framework coupling. The approach is not Django-specific; Django is just a good fit because its static file conventions make wiring it up easy. Any stack that serves CSS and renders HTML can use the generated stylesheet directly.
 
 ```css
-.icon { display: inline-block; width: 1em; height: 1em; }
+.icon       { display: inline-block; width: 1em; height: 1em; background-color: currentColor; mask-image: var(--icon-url); mask-size: contain; mask-mode: alpha; }
+.icon-color { display: inline-block; width: 1em; height: 1em; background-image: var(--icon-url); background-size: contain; }
 
-.icon-search, .icon-check { background-color: currentColor; mask-size: contain; mask-mode: alpha; }
-.icon-search { mask-image: url("/static/icons/search.svg"); }
-
-.icon-logo { background-image: url("/static/logos/logo.svg"); }
+.icon-search { --icon-url: url("/static/icons/search.svg"); }
+.icon-logo   { --icon-url: url("/static/logos/logo.svg"); }
 ```
 
 - `currentColor` + `mask-image`: icons inherit text color

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking**: color-preserving icons now render via the `.icon-color` base class instead of being inferred from the per-icon class. Use `<i class="icon-color icon-logo">` instead of `<i class="icon icon-logo">`.
+- **Breaking**: the `color` option on icon sets is now a boolean. Replace `color="original"` with `color=True`; `color="mono"` is now the default (just omit it).
+- Per-icon rules are now a single `--icon-url` custom property. The generated CSS collapses the previous grouped mono/multi selectors into two small base rules (`.icon`, `.icon-color`), shrinking the output for sets with many icons.
+
 ## 0.2.0
 
 - `iconx remove <package>` command to delete downloaded icon packages

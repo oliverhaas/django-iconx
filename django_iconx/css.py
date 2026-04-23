@@ -47,35 +47,27 @@ def generate_css(
     prefix = icon_settings.prefix
     mode = icon_settings.mode
 
-    # Partition icons by color mode
-    mono_names = sorted(n for n in icons if icon_set_map[n].color == "mono")
-    multi_names = sorted(n for n in icons if icon_set_map[n].color == "original")
+    has_mono = any(not icon_set_map[n].color for n in icons)
+    has_color = any(icon_set_map[n].color for n in icons)
 
-    lines = [_base_rule(prefix, icon_settings.size)]
+    lines: list[str] = []
+    if has_mono:
+        lines.append(_mono_base_rule(prefix, icon_settings.size))
+    if has_color:
+        lines.append(_color_base_rule(prefix, icon_settings.size))
 
-    # Grouped mono base selector
-    if mono_names:
-        lines.append(_mono_base_rule(prefix, mono_names))
+    lines.extend(
+        _icon_rule(prefix, icon_name, icons[icon_name], discovered.relatives[icon_name], mode)
+        for icon_name in sorted(icons)
+    )
 
-    # Grouped multi base selector
-    if multi_names:
-        lines.append(_multi_base_rule(prefix, multi_names))
-
-    # Individual icon rules
-    for icon_name in sorted(icons):
-        color = icon_set_map[icon_name].color
-        lines.append(_icon_rule(prefix, icon_name, icons[icon_name], discovered.relatives[icon_name], mode, color))
-
-    # Size-variant overrides
     for icon_name in sorted(variants):
-        color = icon_set_map[icon_name].color
         variant_rules = _size_variant_rules(
             prefix,
             icon_name,
             variants[icon_name],
             discovered.variant_relatives[icon_name],
             mode,
-            color,
         )
         if variant_rules:
             lines.append(variant_rules)
@@ -83,21 +75,15 @@ def generate_css(
     return "\n".join(lines) + "\n"
 
 
-def _base_rule(prefix: str, size: str) -> str:
+def _mono_base_rule(prefix: str, size: str) -> str:
     return f""".{prefix} {{
   display: inline-block;
   width: {size};
   height: {size};
   vertical-align: -0.125em;
   line-height: 1;
-}}"""
-
-
-def _mono_base_rule(prefix: str, icon_names: list[str]) -> str:
-    selectors = ",\n".join(f".{prefix}-{name}" for name in icon_names)
-    return f"""
-{selectors} {{
   background-color: currentColor;
+  mask-image: var(--icon-url);
   mask-size: contain;
   mask-repeat: no-repeat;
   mask-position: center;
@@ -105,20 +91,24 @@ def _mono_base_rule(prefix: str, icon_names: list[str]) -> str:
 }}"""
 
 
-def _multi_base_rule(prefix: str, icon_names: list[str]) -> str:
-    selectors = ",\n".join(f".{prefix}-{name}" for name in icon_names)
+def _color_base_rule(prefix: str, size: str) -> str:
     return f"""
-{selectors} {{
+.{prefix}-color {{
+  display: inline-block;
+  width: {size};
+  height: {size};
+  vertical-align: -0.125em;
+  line-height: 1;
+  background-image: var(--icon-url);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }}"""
 
 
-def _icon_rule(prefix: str, icon_name: str, svg_path: Path, relative: str, mode: str, color: str) -> str:  # noqa: PLR0913
+def _icon_rule(prefix: str, icon_name: str, svg_path: Path, relative: str, mode: str) -> str:
     url = _svg_url(svg_path, relative, mode)
-    prop = "background-image" if color == "original" else "mask-image"
-    return f'\n.{prefix}-{icon_name} {{ {prop}: url("{url}"); }}'
+    return f'\n.{prefix}-{icon_name} {{ --icon-url: url("{url}"); }}'
 
 
 def _svg_url(svg_path: Path, relative: str, mode: str) -> str:
@@ -135,13 +125,12 @@ def _nearest_variant(available_sizes: list[int], target_px: int) -> int:
     return min(available_sizes, key=lambda s: abs(s - target_px))
 
 
-def _size_variant_rules(  # noqa: PLR0913
+def _size_variant_rules(
     prefix: str,
     icon_name: str,
     size_map: dict[int, Path],
     size_relatives: dict[int, str],
     mode: str,
-    color: str,
 ) -> str:
     """Generate text-* override rules that swap to the optimal SVG variant."""
     available = sorted(size_map)
@@ -160,13 +149,12 @@ def _size_variant_rules(  # noqa: PLR0913
     if not variant_to_classes:
         return ""
 
-    prop = "background-image" if color == "original" else "mask-image"
     rules: list[str] = []
     for size_px, text_classes in sorted(variant_to_classes.items()):
         url = _svg_url(size_map[size_px], size_relatives[size_px], mode)
         selectors = ",\n".join(f".{tc}.{prefix}-{icon_name}" for tc in text_classes)
         rules.append(f"""\n{selectors} {{
-  {prop}: url("{url}");
+  --icon-url: url("{url}");
 }}""")
 
     return "\n".join(rules)

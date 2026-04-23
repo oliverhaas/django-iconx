@@ -82,7 +82,7 @@ For your own SVGs, place them in a directory under `STATICFILES_DIRS` and config
 ICONX = {
     "sets": [
         "icons/",
-        {"path": "logos/", "color": "original"},
+        {"path": "logos/", "color": True},
     ],
 }
 ```
@@ -93,7 +93,12 @@ Then regenerate:
 python manage.py iconx generate
 ```
 
-Use `"color": "original"` for multi-color SVGs that should preserve their fill colors.
+Use `"color": True` for multi-color SVGs that should preserve their fill colors. In HTML, render these with the `.icon-color` base class instead of `.icon`:
+
+```html
+<i class="icon icon-search"></i>        <!-- monochrome, inherits text color -->
+<i class="icon-color icon-logo"></i>    <!-- keeps original SVG colors -->
+```
 
 ## Pre-commit hook
 

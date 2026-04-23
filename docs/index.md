@@ -7,9 +7,10 @@ Generates a single CSS file from SVG icon sources. No JavaScript or icon fonts n
 ```html
 <i class="icon icon-search"></i>
 <i class="icon icon-check text-2xl text-green-500"></i>
+<i class="icon-color icon-logo"></i>
 ```
 
-Mono icons use `mask-image` with `currentColor`, so they inherit text color and scale with font size via Tailwind `text-*` classes. Multi-color icons use `background-image` to preserve original SVG colors.
+Icons set a `--icon-url` CSS variable. The `.icon` base class renders it via `mask-image` with `currentColor`, so icons inherit text color and scale with font size via Tailwind `text-*` classes. The `.icon-color` base class renders the same variable via `background-image`, preserving the SVG's original colors — use it for logos and other multi-color artwork.
 
 ## Quick start
 
