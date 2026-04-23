@@ -16,6 +16,11 @@ class IconSet:
     color: bool = False
     include_path: bool = False
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.color, bool):
+            msg = f"color must be a bool, got {type(self.color).__name__}: {self.color!r}"
+            raise TypeError(msg)
+
 
 @dataclass(frozen=True)
 class IconxSettings:

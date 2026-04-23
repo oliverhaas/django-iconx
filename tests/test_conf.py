@@ -21,6 +21,11 @@ class TestIconSet:
         s = IconSet(path="heroicons/", prefix="hero")
         assert s.prefix == "hero"
 
+    def test_rejects_non_bool_color(self):
+        # Catch v0.2 string values instead of silently mis-routing on truthiness.
+        with pytest.raises(TypeError, match="color must be a bool"):
+            IconSet(path="icons/", color="mono")
+
 
 class TestIconxSettings:
     def test_defaults(self):
