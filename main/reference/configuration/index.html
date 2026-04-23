@@ -905,7 +905,7 @@
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">&quot;sets&quot;</span><span class="p">:</span> <span class="p">[</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="s2">&quot;icons/&quot;</span><span class="p">,</span>                                          <span class="c1"># string shorthand</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;heroicons/&quot;</span><span class="p">,</span> <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;hero&quot;</span><span class="p">},</span>          <span class="c1"># with prefix</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;logos/&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;original&quot;</span><span class="p">},</span>            <span class="c1"># multi-color</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;logos/&quot;</span><span class="p">,</span> <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>                 <span class="c1"># keep original colors</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="p">],</span>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
 </code></pre></div>
@@ -932,8 +932,8 @@
 </tr>
 <tr>
 <td><code>color</code></td>
-<td><code>"mono"</code></td>
-<td><code>"mono"</code> for single-color icons (uses CSS mask), <code>"original"</code> for multi-color (uses background-image)</td>
+<td><code>False</code></td>
+<td><code>False</code> for monochrome icons (rendered via CSS mask with <code>currentColor</code>, use with the <code>.icon</code> base class). <code>True</code> preserves the SVG's original colors (rendered as a background image, use with the <code>.icon-color</code> base class).</td>
 </tr>
 <tr>
 <td><code>include_path</code></td>
@@ -969,7 +969,7 @@
 <h3 id="prefix"><code>prefix</code><a class="headerlink" href="#prefix" title="Permanent link">&para;</a></h3>
 <p>CSS class prefix for all icons.</p>
 <p><strong>Default:</strong> <code>"icon"</code></p>
-<p>With the default prefix, icons get classes like <code>.icon</code> (base) and <code>.icon-search</code> (per-icon).</p>
+<p>With the default prefix, icons get classes like <code>.icon</code> / <code>.icon-color</code> (base classes) and <code>.icon-search</code> (per-icon).</p>
 <h3 id="size"><code>size</code><a class="headerlink" href="#size" title="Permanent link">&para;</a></h3>
 <p>Default icon dimensions (width and height).</p>
 <p><strong>Default:</strong> <code>"1em"</code></p>
