@@ -34,7 +34,7 @@ jobs:
       - run: uv run pytest -n auto
       - name: Upload coverage
         if: matrix.python-version == '3.14' && matrix.django-version == '6.0'
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
           fail_ci_if_error: false
