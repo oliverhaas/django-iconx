@@ -39,8 +39,8 @@ dev = [
   "pytest-cov==7.1.0",
   "pytest-django==4.12.0",
   "pytest-xdist==3.8.0",
-  "pytest==9.1.0",
-  "ruff==0.15.17",
+  "pytest==9.1.1",
+  "ruff==0.15.18",
 ]
 docs = ["mkdocs==1.6.1", "mkdocs-material==9.7.6", "mike==2.2.0"]
 
