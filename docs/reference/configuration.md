@@ -23,9 +23,9 @@ List of icon set definitions. Each entry is either a path string or a dict with 
 ```python
 ICONX = {
     "sets": [
-        "icons/",                                          # string shorthand
-        {"path": "heroicons/", "prefix": "hero"},          # with prefix
-        {"path": "logos/", "color": True},                 # keep original colors
+        "icons/",  # string shorthand
+        {"path": "heroicons/", "prefix": "hero"},  # with prefix
+        {"path": "logos/", "color": True},  # keep original colors
     ],
 }
 ```
